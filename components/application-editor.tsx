@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import type React from "react"
+
+import { useState, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   User,
   Mail,
@@ -31,6 +35,10 @@ import {
   Building2,
   ChevronDown,
   ChevronRight,
+  Download,
+  Eye,
+  AlertCircle,
+  Copy,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -57,6 +65,19 @@ const EMPLOYMENT_TYPES = [
   { value: "other", label: "Sonstiges", color: "bg-gray-100 text-gray-800", category: "other" },
 ]
 
+// Supported file types
+const SUPPORTED_FILE_TYPES = {
+  "application/pdf": { label: "PDF", icon: "📄" },
+  "application/msword": { label: "Word", icon: "📝" },
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { label: "Word", icon: "📝" },
+  "image/jpeg": { label: "JPEG", icon: "🖼️" },
+  "image/png": { label: "PNG", icon: "🖼️" },
+  "image/gif": { label: "GIF", icon: "🖼️" },
+  "text/plain": { label: "Text", icon: "📄" },
+  "application/vnd.ms-excel": { label: "Excel", icon: "📊" },
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { label: "Excel", icon: "📊" },
+}
+
 // German/EU skill rating system (1-5 scale)
 const SKILL_LEVELS = [
   { value: 1, label: "Grundkenntnisse", description: "Basic knowledge" },
@@ -80,6 +101,8 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
   const [activeSection, setActiveSection] = useState("personal")
   const [isSaving, setIsSaving] = useState(false)
   const [expandedCompanies, setExpandedCompanies] = useState<Set<string>>(new Set())
+  const [dragActive, setDragActive] = useState<string | null>(null)
+  const [filePreview, setFilePreview] = useState<any>(null)
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -113,32 +136,100 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     }
   }
 
-  const handleFileUpload = (file: File, section: string, itemId?: string) => {
-    // Create a file object to store
-    const fileData = {
-      id: `file-${Date.now()}`,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadDate: new Date().toISOString(),
-      section,
-      itemId,
+  const validateFile = (file: File): { valid: boolean; error?: string } => {
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      return { valid: false, error: "Datei ist zu groß (max. 10MB)" }
     }
 
-    // Add to selected documents
-    const currentDocs = application.selected_documents || []
-    const updatedDocs = [...currentDocs, fileData]
+    // Check file type
+    if (!SUPPORTED_FILE_TYPES[file.type as keyof typeof SUPPORTED_FILE_TYPES]) {
+      return { valid: false, error: "Dateityp wird nicht unterstützt" }
+    }
 
-    onUpdate({ selected_documents: updatedDocs })
-
-    toast({
-      title: "Datei hochgeladen",
-      description: `${file.name} wurde erfolgreich hinzugefügt.`,
-    })
+    return { valid: true }
   }
+
+  const handleFileUpload = useCallback(
+    (files: FileList, section: string, itemId?: string) => {
+      const fileArray = Array.from(files)
+      const validFiles: any[] = []
+      const errors: string[] = []
+
+      fileArray.forEach((file) => {
+        const validation = validateFile(file)
+        if (validation.valid) {
+          const fileData = {
+            id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadDate: new Date().toISOString(),
+            section,
+            itemId,
+            // In a real app, you'd upload to a file storage service and store the URL
+            url: URL.createObjectURL(file),
+            description: "",
+          }
+          validFiles.push(fileData)
+        } else {
+          errors.push(`${file.name}: ${validation.error}`)
+        }
+      })
+
+      if (validFiles.length > 0) {
+        const currentDocs = application.selected_documents || []
+        const updatedDocs = [...currentDocs, ...validFiles]
+        onUpdate({ selected_documents: updatedDocs })
+
+        toast({
+          title: "Dateien hochgeladen",
+          description: `${validFiles.length} Datei(en) erfolgreich hinzugefügt.`,
+        })
+      }
+
+      if (errors.length > 0) {
+        toast({
+          title: "Einige Dateien konnten nicht hochgeladen werden",
+          description: errors.join(", "),
+          variant: "destructive",
+        })
+      }
+    },
+    [application.selected_documents, onUpdate, toast],
+  )
+
+  const handleDragOver = useCallback((e: React.DragEvent, dropZoneId: string) => {
+    e.preventDefault()
+    setDragActive(dropZoneId)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(null)
+  }, [])
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent, section: string, itemId?: string) => {
+      e.preventDefault()
+      setDragActive(null)
+
+      const files = e.dataTransfer.files
+      if (files.length > 0) {
+        handleFileUpload(files, section, itemId)
+      }
+    },
+    [handleFileUpload],
+  )
 
   const removeFile = (fileId: string) => {
     const currentDocs = application.selected_documents || []
+    const fileToRemove = currentDocs.find((doc: any) => doc.id === fileId)
+
+    if (fileToRemove?.url && fileToRemove.url.startsWith("blob:")) {
+      URL.revokeObjectURL(fileToRemove.url)
+    }
+
     const updatedDocs = currentDocs.filter((doc: any) => doc.id !== fileId)
     onUpdate({ selected_documents: updatedDocs })
 
@@ -146,6 +237,27 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
       title: "Datei entfernt",
       description: "Die Datei wurde erfolgreich entfernt.",
     })
+  }
+
+  const updateFileDescription = (fileId: string, description: string) => {
+    const currentDocs = application.selected_documents || []
+    const updatedDocs = currentDocs.map((doc: any) => (doc.id === fileId ? { ...doc, description } : doc))
+    onUpdate({ selected_documents: updatedDocs })
+  }
+
+  const downloadFile = (file: any) => {
+    if (file.url) {
+      const link = document.createElement("a")
+      link.href = file.url
+      link.download = file.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  const previewFile = (file: any) => {
+    setFilePreview(file)
   }
 
   const updatePersonalInfo = (field: string, value: string) => {
@@ -220,6 +332,28 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
       title: "Position dupliziert",
       description: "Die Position wurde erfolgreich kopiert. Sie können sie nun bearbeiten.",
     })
+  }
+
+  const addPositionToCompany = (company: string) => {
+    const experiences = application.resume_data?.experience || []
+    const companyExperiences = experiences.filter((exp: any) => exp.company === company)
+
+    if (companyExperiences.length > 0) {
+      const latestExp = companyExperiences[0]
+      const newExp = {
+        ...latestExp,
+        id: `exp-${Date.now()}`,
+        title: "",
+        startDate: "",
+        endDate: "",
+        current: false,
+        description: "",
+        achievements: [],
+        technologies: [],
+        skills: [],
+      }
+      updateResume("experience", [...experiences, newExp])
+    }
   }
 
   const addSkillCategory = () => {
@@ -354,28 +488,47 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     ))
   }
 
-  const renderFileUpload = (section: string, itemId?: string) => (
-    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          const files = Array.from(e.target.files || [])
-          files.forEach((file) => handleFileUpload(file, section, itemId))
-        }}
-      />
-      <div className="text-center">
-        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-sm text-gray-600 mb-2">Dateien hier ablegen oder klicken zum Auswählen</p>
-        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-          <Paperclip className="w-4 h-4 mr-2" />
-          Dateien anhängen
-        </Button>
+  const renderFileUpload = (section: string, itemId?: string) => {
+    const dropZoneId = `${section}-${itemId || "general"}`
+    const isDragActive = dragActive === dropZoneId
+
+    return (
+      <div className="space-y-4">
+        <div
+          className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+            isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+          }`}
+          onDragOver={(e) => handleDragOver(e, dropZoneId)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => handleDrop(e, section, itemId)}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={Object.keys(SUPPORTED_FILE_TYPES).join(",")}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) {
+                handleFileUpload(e.target.files, section, itemId)
+              }
+            }}
+          />
+          <div className="text-center">
+            <Upload className={`w-8 h-8 mx-auto mb-2 ${isDragActive ? "text-blue-500" : "text-gray-400"}`} />
+            <p className={`text-sm mb-2 ${isDragActive ? "text-blue-700" : "text-gray-600"}`}>
+              {isDragActive ? "Dateien hier ablegen..." : "Dateien hier ablegen oder klicken zum Auswählen"}
+            </p>
+            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+              <Paperclip className="w-4 h-4 mr-2" />
+              Dateien auswählen
+            </Button>
+            <p className="text-xs text-gray-500 mt-2">Unterstützte Formate: PDF, Word, Excel, Bilder (max. 10MB)</p>
+          </div>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderAttachedFiles = (section: string, itemId?: string) => {
     const files = (application.selected_documents || []).filter(
@@ -385,23 +538,62 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     if (files.length === 0) return null
 
     return (
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Angehängte Dateien</Label>
-        <div className="space-y-2">
-          {files.map((file: any) => (
-            <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-              <div className="flex items-center gap-2">
-                <File className="w-4 h-4 text-gray-500" />
-                <span className="text-sm">{file.name}</span>
-                <Badge variant="outline" className="text-xs">
-                  {(file.size / 1024).toFixed(1)} KB
-                </Badge>
-              </div>
-              <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(file.id)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Angehängte Dateien ({files.length})</Label>
+        <div className="space-y-3">
+          {files.map((file: any) => {
+            const fileType = SUPPORTED_FILE_TYPES[file.type as keyof typeof SUPPORTED_FILE_TYPES]
+            return (
+              <Card key={file.id} className="p-3">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">{fileType?.icon || "📄"}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium truncate">{file.name}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {fileType?.label || "Unknown"}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-gray-500 mb-2">
+                      Hochgeladen: {new Date(file.uploadDate).toLocaleDateString("de-DE")}
+                    </div>
+                    <Input
+                      placeholder="Beschreibung hinzufügen..."
+                      value={file.description || ""}
+                      onChange={(e) => updateFileDescription(file.id, e.target.value)}
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="flex gap-1">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => previewFile(file)} title="Vorschau">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => downloadFile(file)}
+                      title="Herunterladen"
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFile(file.id)}
+                      title="Entfernen"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
         </div>
       </div>
     )
@@ -740,8 +932,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation()
-                            const latestExp = companyExperiences[0]
-                            duplicateExperience(latestExp)
+                            addPositionToCompany(company)
                           }}
                         >
                           <Plus className="w-4 h-4 mr-1" />
@@ -757,10 +948,10 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="space-y-6 pt-0">
+                  <CardContent className="space-y-8 pt-0">
                     {companyExperiences.map((exp: any, index: number) => (
-                      <div key={exp.id} className={`${index > 0 ? "border-t pt-6" : ""}`}>
-                        <div className="flex items-center justify-between mb-4">
+                      <div key={exp.id} className={`${index > 0 ? "border-t pt-8" : ""}`}>
+                        <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center gap-2">
                             <Badge
                               className={
@@ -775,7 +966,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={() => duplicateExperience(exp)}>
-                              <Plus className="w-4 h-4 mr-1" />
+                              <Copy className="w-4 h-4 mr-1" />
                               Duplizieren
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => removeExperience(exp.id)}>
@@ -784,7 +975,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                           <div>
                             <Label>Jobtitel / Aktivität *</Label>
                             <Input
@@ -882,7 +1073,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           </div>
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-6">
                           <Label>Beschreibung der Tätigkeit *</Label>
                           <Textarea
                             value={exp.description}
@@ -892,7 +1083,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           />
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-6">
                           <Label>Erfolge und Leistungen</Label>
                           <Textarea
                             value={exp.achievements?.join("\n") || ""}
@@ -909,7 +1100,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           <p className="text-sm text-gray-500 mt-1">Ein Erfolg pro Zeile</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                           <div>
                             <Label>Verwendete Technologien</Label>
                             <Input
@@ -948,10 +1139,20 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
                           </div>
                         </div>
 
-                        <Separator className="my-4" />
+                        <Separator className="my-6" />
 
                         <div className="space-y-4">
-                          <Label>Dokumente und Nachweise</Label>
+                          <div className="flex items-center gap-2">
+                            <Paperclip className="w-4 h-4 text-gray-600" />
+                            <Label className="text-base font-medium">Dokumente und Nachweise</Label>
+                          </div>
+                          <Alert>
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>
+                              Fügen Sie relevante Dokumente hinzu wie Arbeitszeugnisse, Stellenbeschreibungen,
+                              Leistungsbeurteilungen oder Zertifikate für diese Position.
+                            </AlertDescription>
+                          </Alert>
                           {renderFileUpload("experience", exp.id)}
                           {renderAttachedFiles("experience", exp.id)}
                         </div>
@@ -963,6 +1164,34 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
             </Card>
           ))
         )}
+
+        {/* File Preview Dialog */}
+        <Dialog open={!!filePreview} onOpenChange={() => setFilePreview(null)}>
+          <DialogContent className="max-w-4xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <File className="w-5 h-5" />
+                {filePreview?.name}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-auto">
+              {filePreview?.type.startsWith("image/") ? (
+                <img src={filePreview.url || "/placeholder.svg"} alt={filePreview.name} className="max-w-full h-auto" />
+              ) : filePreview?.type === "application/pdf" ? (
+                <iframe src={filePreview.url} className="w-full h-96" title={filePreview.name} />
+              ) : (
+                <div className="text-center py-8">
+                  <File className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">Vorschau für diesen Dateityp nicht verfügbar</p>
+                  <Button onClick={() => downloadFile(filePreview)} className="mt-4">
+                    <Download className="w-4 h-4 mr-2" />
+                    Datei herunterladen
+                  </Button>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     )
   }
@@ -1077,7 +1306,10 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
           <Separator />
 
           <div className="space-y-4">
-            <Label>Zeugnisse und Nachweise</Label>
+            <div className="flex items-center gap-2">
+              <Paperclip className="w-4 h-4 text-gray-600" />
+              <Label className="text-base font-medium">Zeugnisse und Nachweise</Label>
+            </div>
             {renderFileUpload("education")}
             {renderAttachedFiles("education")}
           </div>

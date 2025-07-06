@@ -19,6 +19,7 @@ import {
   FileText,
   Award,
   Briefcase,
+  Paperclip,
 } from "lucide-react"
 import type { Database } from "@/lib/database.types"
 
@@ -273,6 +274,10 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
               <div className="space-y-6 print:space-y-4">
                 {companyExperiences.map((exp: any, index: number) => {
                   const employmentType = getEmploymentTypeBadge(exp.employmentType)
+                  const positionFiles = (application.selected_documents || []).filter(
+                    (doc: any) => doc.section === "experience" && doc.itemId === exp.id,
+                  )
+
                   return (
                     <div
                       key={exp.id}
@@ -352,6 +357,37 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
                               >
                                 {skill}
                               </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Position-specific attachments */}
+                      {positionFiles.length > 0 && (
+                        <div className="mb-3">
+                          <div className="text-sm font-medium mb-2 flex items-center gap-1 print:text-base print:font-bold">
+                            <Paperclip className="w-4 h-4 print:hidden" />
+                            Angehängte Dokumente ({positionFiles.length}):
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 print:grid-cols-1 print:gap-1">
+                            {positionFiles.map((file: any) => (
+                              <div
+                                key={file.id}
+                                className="flex items-center gap-2 p-2 bg-gray-50 rounded text-xs print:bg-transparent print:border print:border-gray-300"
+                              >
+                                <FileText className="w-3 h-3 text-gray-500 print:hidden" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium truncate print:text-sm">{file.name}</div>
+                                  {file.description && (
+                                    <div className="text-gray-600 truncate print:text-black print:text-xs">
+                                      {file.description}
+                                    </div>
+                                  )}
+                                </div>
+                                <Badge variant="outline" className="text-xs print:hidden">
+                                  {(file.size / 1024).toFixed(1)} KB
+                                </Badge>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -706,6 +742,7 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
                         <div className="font-medium text-sm print:text-base print:font-bold">{doc.name}</div>
                         <div className="text-xs text-muted-foreground print:text-sm print:text-black">
                           {(doc.size / 1024).toFixed(1)} KB • {doc.section}
+                          {doc.description && ` • ${doc.description}`}
                         </div>
                       </div>
                     </div>
