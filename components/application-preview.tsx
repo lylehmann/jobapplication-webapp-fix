@@ -1,1363 +1,593 @@
 "use client"
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-  ArrowLeft,
-  Edit,
-  Download,
-  Share,
-  Smartphone,
-  Palette,
+  User,
   Mail,
   Phone,
   MapPin,
-  Linkedin,
   Globe,
   Github,
-  Code2,
-  Database,
-  Figma,
-  GitBranch,
-  Layers3,
-  Terminal,
+  Linkedin,
+  Calendar,
+  Building2,
+  Star,
+  ExternalLink,
+  FileText,
+  Award,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import type { Database } from "@/lib/database.types"
 
-interface Application {
-  id: string
-  jobTitle: string
-  company: string
-  status: "draft" | "in-progress" | "submitted" | "archived"
-  lastModified: string
-  template?: string
-  coverLetter: string
-  resume: any
-  projectOverview: string
-  documents: any[]
-}
+type Application = Database["public"]["Tables"]["applications"]["Row"]
 
 interface ApplicationPreviewProps {
   application: Application
-  onBack: () => void
-  onEdit: () => void
 }
 
-export function ApplicationPreview({ application, onBack, onEdit }: ApplicationPreviewProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "draft":
-        return "bg-gray-100 text-gray-800"
-      case "in-progress":
-        return "bg-blue-100 text-blue-800"
-      case "submitted":
-        return "bg-green-100 text-green-800"
-      case "archived":
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
+export function ApplicationPreview({ application }: ApplicationPreviewProps) {
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
+    ))
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Editor
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">{application.jobTitle}</h1>
-              <p className="text-gray-600">{application.company}</p>
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    const date = new Date(dateString + "-01")
+    return date.toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })
+  }
+
+  const renderPersonalInfo = () => (
+    <Card className="print:shadow-none print:border-0">
+      <CardHeader className="print:pb-4">
+        <CardTitle className="flex items-center gap-2 text-center print:text-2xl">
+          <User className="w-5 h-5 print:hidden" />
+          {application.personal_info?.fullName || "Name nicht angegeben"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
+          {application.personal_info?.email && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.email}</span>
             </div>
-            <Badge className={getStatusColor(application.status)}>{application.status}</Badge>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={onEdit}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-            <Button variant="outline">
-              <Share className="w-4 h-4 mr-2" />
-              Share
-            </Button>
-            <Button>
-              <Download className="w-4 h-4 mr-2" />
-              Export Bundle
-            </Button>
-          </div>
+          )}
+          {application.personal_info?.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.phone}</span>
+            </div>
+          )}
+          {application.personal_info?.location && (
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.location}</span>
+            </div>
+          )}
+          {application.personal_info?.portfolio && (
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.portfolio}</span>
+            </div>
+          )}
+          {application.personal_info?.github && (
+            <div className="flex items-center gap-2">
+              <Github className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.github}</span>
+            </div>
+          )}
+          {application.personal_info?.linkedin && (
+            <div className="flex items-center gap-2">
+              <Linkedin className="w-4 h-4 text-muted-foreground print:hidden" />
+              <span className="text-sm">{application.personal_info.linkedin}</span>
+            </div>
+          )}
         </div>
 
-        <div className="space-y-8">
-          {/* Cover Letter */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Cover Letter</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-w-none bg-white shadow-sm border rounded-lg overflow-hidden">
-                {/* Modern Header Section */}
-                <div className="bg-gradient-to-r from-slate-50 to-gray-100 p-8">
-                  <div className="flex justify-between items-start">
-                    {/* Sender Information - Modern Layout */}
-                    <div className="space-y-1">
-                      <h2 className="text-2xl font-bold text-gray-900">John Doe</h2>
-                      <p className="text-gray-600">Senior Frontend Developer</p>
-                    </div>
+        <Separator className="print:border-gray-400" />
 
-                    {/* Contact Details - Modern Grid */}
-                    <div className="text-right space-y-1 text-sm">
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                          <Mail className="w-3 h-3 text-blue-600" />
-                        </div>
-                        <span className="text-gray-700">john.doe@email.com</span>
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                          <Phone className="w-3 h-3 text-blue-600" />
-                        </div>
-                        <span className="text-gray-700">(555) 123-4567</span>
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                          <MapPin className="w-3 h-3 text-blue-600" />
-                        </div>
-                        <span className="text-gray-700">123 Main Street, San Francisco, CA 94102</span>
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                          <Linkedin className="w-3 h-3 text-blue-600" />
-                        </div>
-                        <span className="text-gray-700">linkedin.com/in/johndoe</span>
-                      </div>
-                    </div>
+        <div className="flex items-center justify-between print:justify-center print:text-center">
+          <div>
+            <div className="font-medium text-lg print:text-xl">{application.job_title}</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-1 print:justify-center">
+              <Building2 className="w-4 h-4 print:hidden" />
+              {application.company}
+            </div>
+          </div>
+          <Badge variant="outline" className="print:hidden">
+            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  const renderCoverLetter = () => (
+    <Card className="print:shadow-none print:border-0 print:break-before-page">
+      <CardHeader className="print:pb-4">
+        <CardTitle className="print:text-xl">Anschreiben</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 print:space-y-6">
+        <div className="text-right text-sm text-muted-foreground print:text-black">
+          {application.cover_letter_data?.date &&
+            new Date(application.cover_letter_data.date).toLocaleDateString("de-DE")}
+        </div>
+
+        {application.cover_letter_data?.address && (
+          <div className="text-sm print:text-base">
+            <div className="font-medium">{application.cover_letter_data.company || application.company}</div>
+            <div className="whitespace-pre-line">{application.cover_letter_data.address}</div>
+          </div>
+        )}
+
+        {application.cover_letter_data?.subject && (
+          <div className="font-medium print:text-base print:font-bold">
+            Betreff: {application.cover_letter_data.subject}
+          </div>
+        )}
+
+        {application.cover_letter_data?.salutation && (
+          <div className="print:text-base">{application.cover_letter_data.salutation}</div>
+        )}
+
+        {application.cover_letter_data?.openingParagraph && (
+          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
+            {application.cover_letter_data.openingParagraph}
+          </p>
+        )}
+
+        {application.cover_letter_data?.bodyParagraphs && (
+          <div className="text-sm leading-relaxed whitespace-pre-line print:text-base print:leading-relaxed">
+            {application.cover_letter_data.bodyParagraphs}
+          </div>
+        )}
+
+        {application.cover_letter_data?.closingParagraph && (
+          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
+            {application.cover_letter_data.closingParagraph}
+          </p>
+        )}
+
+        {application.cover_letter_data?.signOff && (
+          <div className="text-sm print:text-base print:mt-8">
+            {application.cover_letter_data.signOff}
+            <br />
+            {application.personal_info?.fullName}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+
+  const renderSummary = () =>
+    application.resume_data?.summary && (
+      <Card className="print:shadow-none print:border-0 print:break-before-page">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Berufliches Profil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
+            {application.resume_data.summary}
+          </p>
+        </CardContent>
+      </Card>
+    )
+
+  const renderExperience = () =>
+    application.resume_data?.experience &&
+    application.resume_data.experience.length > 0 && (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Berufserfahrung</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 print:space-y-4">
+          {application.resume_data.experience.map((exp: any) => (
+            <div key={exp.id} className="border-l-2 border-blue-200 pl-4 print:border-l-4 print:border-gray-400">
+              <div className="flex items-start justify-between mb-2 print:block">
+                <div>
+                  <h4 className="font-medium print:text-base print:font-bold">{exp.title}</h4>
+                  <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base">
+                    <Building2 className="w-4 h-4 print:hidden" />
+                    {exp.company}
+                    {exp.location && ` • ${exp.location}`}
                   </div>
                 </div>
-
-                {/* Letter Content */}
-                <div className="p-8">
-                  {/* Recipient Information - Modern Card Style */}
-                  <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                    <div className="space-y-1">
-                      <p className="font-semibold text-gray-900">Hiring Manager</p>
-                      <p className="text-gray-700">Human Resources Department</p>
-                      <p className="font-semibold text-gray-900">{application.company}</p>
-                      <p className="text-gray-700">456 Business Ave</p>
-                      <p className="text-gray-700">San Francisco, CA 94105</p>
-                    </div>
-                  </div>
-
-                  {/* Date and Location - Right aligned */}
-                  <div className="mb-6 text-right">
-                    <p className="text-gray-700 font-medium">San Francisco, CA</p>
-                    <p className="text-gray-700 font-medium">
-                      {new Date().toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-
-                  {/* Subject Line - Proper headline format */}
-                  <div className="mb-6">
-                    <p className="font-semibold text-gray-900 text-lg">
-                      Subject: Application for {application.jobTitle} Position
-                    </p>
-                  </div>
-
-                  {/* Letter Body */}
-                  <div className="space-y-4 leading-relaxed text-gray-700">
-                    <p className="font-medium text-gray-900">Dear Hiring Manager,</p>
-
-                    <p>
-                      I am writing to express my strong interest in the {application.jobTitle} position at{" "}
-                      {application.company}. With my background in software development and passion for creating
-                      exceptional user experiences, I am excited about the opportunity to contribute to your team's
-                      success.
-                    </p>
-
-                    {application.coverLetter ? (
-                      <div className="whitespace-pre-wrap">{application.coverLetter}</div>
-                    ) : (
-                      <div className="space-y-4">
-                        <p>
-                          In my previous role as Senior Frontend Developer at TechCorp Inc., I successfully led the
-                          development of customer-facing web applications serving over 100,000 users. My experience with
-                          React, JavaScript, and modern web technologies has enabled me to deliver high-quality
-                          solutions that drive business growth and enhance user satisfaction.
-                        </p>
-
-                        <p>
-                          What particularly excites me about this opportunity at {application.company} is your
-                          commitment to innovation and user-centric design. I am eager to bring my technical expertise
-                          and collaborative approach to help your team continue building exceptional products that make
-                          a meaningful impact.
-                        </p>
-                      </div>
-                    )}
-
-                    <p>
-                      I would welcome the opportunity to discuss how my skills and experience can contribute to{" "}
-                      {application.company}'s continued success. Thank you for considering my application, and I look
-                      forward to hearing from you soon.
-                    </p>
-
-                    {/* Simple Signature Section */}
-                    <div className="mt-8 pt-6 border-t border-gray-200">
-                      <p className="text-gray-700 mb-8">Sincerely,</p>
-                      <p className="font-bold text-gray-900 text-lg">John Doe</p>
-                    </div>
-                  </div>
+                <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
+                  <Calendar className="w-4 h-4 print:hidden" />
+                  {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Resume Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Resume</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-white shadow-sm border rounded-lg overflow-hidden">
-                {/* Modern Professional Resume Header */}
-                <div className="bg-white border-b-2 border-gray-100 p-8">
-                  <div className="flex items-center gap-8">
-                    {/* Profile Picture */}
-                    <div className="flex-shrink-0">
-                      <div className="w-28 h-28 rounded-full border-3 border-blue-200 shadow-md overflow-hidden bg-white">
-                        <img
-                          src="/placeholder.svg?height=112&width=112&text=Profile"
-                          alt="John Doe"
-                          className="w-full h-full object-cover"
-                        />
+              {exp.description && (
+                <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">{exp.description}</p>
+              )}
+
+              {exp.achievements && exp.achievements.length > 0 && (
+                <div className="mb-3">
+                  <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
+                  <ul className="text-sm space-y-1 print:text-base print:space-y-1">
+                    {exp.achievements.map((achievement: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-1 print:text-black">•</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {exp.technologies && exp.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1 print:gap-2">
+                  {exp.technologies.map((tech: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+
+  const renderEducation = () =>
+    application.resume_data?.education?.degree && (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Bildung</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div>
+              <h4 className="font-medium print:text-base print:font-bold">
+                {application.resume_data.education.degree.title}
+              </h4>
+              <div className="text-sm text-muted-foreground print:text-black print:text-base">
+                {application.resume_data.education.degree.institution}
+                {application.resume_data.education.degree.location &&
+                  ` • ${application.resume_data.education.degree.location}`}
+                {application.resume_data.education.degree.graduationYear &&
+                  ` • ${application.resume_data.education.degree.graduationYear}`}
+              </div>
+              {application.resume_data.education.degree.gpa && (
+                <div className="text-sm text-muted-foreground print:text-black print:text-base">
+                  Note: {application.resume_data.education.degree.gpa}
+                </div>
+              )}
+              {application.resume_data.education.degree.thesis && (
+                <div className="text-sm mt-2 print:text-base">
+                  <span className="font-medium print:font-bold">Abschlussarbeit:</span>{" "}
+                  {application.resume_data.education.degree.thesis}
+                </div>
+              )}
+            </div>
+
+            {application.resume_data.education.certifications &&
+              application.resume_data.education.certifications.length > 0 && (
+                <div>
+                  <Separator className="my-3 print:border-gray-400" />
+                  <h5 className="font-medium mb-2 flex items-center gap-2 print:text-base print:font-bold">
+                    <Award className="w-4 h-4 print:hidden" />
+                    Zertifikate
+                  </h5>
+                  <div className="space-y-2">
+                    {application.resume_data.education.certifications.map((cert: any) => (
+                      <div key={cert.id} className="text-sm print:text-base">
+                        <div className="font-medium print:font-bold">{cert.name}</div>
+                        <div className="text-muted-foreground print:text-black">
+                          {cert.issuer} • {new Date(cert.date).toLocaleDateString("de-DE")}
+                          {cert.expirationDate &&
+                            ` • Gültig bis ${new Date(cert.expirationDate).toLocaleDateString("de-DE")}`}
+                        </div>
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+          </div>
+        </CardContent>
+      </Card>
+    )
 
-                    {/* Personal Information - Modern Layout */}
+  const renderSkills = () =>
+    application.resume_data?.skills &&
+    Object.keys(application.resume_data.skills).length > 0 && (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Fähigkeiten</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {Object.entries(application.resume_data.skills).map(([categoryName, skills]: [string, any]) => (
+            <div key={categoryName}>
+              <h5 className="font-medium mb-2 capitalize print:text-base print:font-bold">{categoryName}</h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 print:gap-2">
+                {skills.map((skill: any) => (
+                  <div key={skill.id} className="flex items-center justify-between print:justify-start print:gap-4">
                     <div className="flex-1">
-                      <div className="mb-4">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-1">John Doe</h2>
-                        <p className="text-xl text-blue-600 font-medium">Senior Frontend Developer</p>
-                        <p className="text-gray-600 mt-1">5+ years experience • San Francisco, CA</p>
-                      </div>
-
-                      {/* Contact Grid - Modern Layout */}
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Mail className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Email</p>
-                            <p className="text-gray-900 font-medium">john.doe@email.com</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Phone className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Phone</p>
-                            <p className="text-gray-900 font-medium">(555) 123-4567</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Linkedin className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">LinkedIn</p>
-                            <p className="text-gray-900 font-medium">linkedin.com/in/johndoe</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Globe className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Portfolio</p>
-                            <p className="text-gray-900 font-medium">johndoe.dev</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Github className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">GitHub</p>
-                            <p className="text-gray-900 font-medium">github.com/johndoe</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <MapPin className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Location</p>
-                            <p className="text-gray-900 font-medium">San Francisco, CA</p>
-                          </div>
-                        </div>
+                      <div className="text-sm font-medium print:text-base print:font-bold">{skill.name}</div>
+                      <div className="text-xs text-muted-foreground print:text-sm print:text-black">
+                        {skill.yearsOfExperience} Jahre Erfahrung
                       </div>
                     </div>
+                    <div className="flex items-center gap-1 print:hidden">{renderStars(skill.rating)}</div>
+                    <div className="hidden print:block text-sm">
+                      {Array.from({ length: skill.rating }, () => "★").join("")}
+                      {Array.from({ length: 5 - skill.rating }, () => "☆").join("")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+
+  const renderLanguages = () =>
+    application.resume_data?.languages &&
+    application.resume_data.languages.length > 0 && (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Sprachen</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
+            {application.resume_data.languages.map((language: any) => (
+              <div key={language.id} className="flex items-center justify-between print:justify-start print:gap-4">
+                <div>
+                  <div className="font-medium flex items-center gap-2 print:text-base print:font-bold">
+                    {language.flag && <span>{language.flag}</span>}
+                    {language.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground print:text-base print:text-black">
+                    {language.description}
                   </div>
                 </div>
+                <Badge variant="outline" className="print:bg-gray-100 print:text-black print:text-sm">
+                  {language.level}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
 
-                {/* Resume Content */}
-                <div className="p-8 space-y-8">
-                  {/* Professional Summary */}
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
-                      Professional Summary
-                    </h4>
-                    <p className="text-gray-700 leading-relaxed">
-                      Experienced software developer with 5+ years of expertise in full-stack development, specializing
-                      in React, Node.js, and cloud technologies. Proven track record of delivering scalable applications
-                      and leading cross-functional teams.
-                    </p>
+  const renderProjects = () =>
+    application.projects_data &&
+    application.projects_data.length > 0 && (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="print:text-xl">Projekte</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 print:space-y-4">
+          {application.projects_data.map((project: any) => (
+            <div key={project.id} className="border-l-2 border-green-200 pl-4 print:border-l-4 print:border-gray-400">
+              <div className="flex items-start justify-between mb-2 print:block">
+                <div>
+                  <h4 className="font-medium flex items-center gap-2 print:text-base print:font-bold">
+                    {project.name}
+                    {project.url && (
+                      <a href={project.url} target="_blank" rel="noopener noreferrer" className="print:hidden">
+                        <ExternalLink className="w-4 h-4 text-blue-500" />
+                      </a>
+                    )}
+                  </h4>
+                  <div className="text-sm text-muted-foreground print:text-base print:text-black">
+                    {project.role && `${project.role} • `}
+                    {project.teamSize && `${project.teamSize} • `}
+                    <Badge
+                      variant="outline"
+                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                    >
+                      {project.status === "completed"
+                        ? "Abgeschlossen"
+                        : project.status === "in-progress"
+                          ? "In Bearbeitung"
+                          : "Geplant"}
+                    </Badge>
                   </div>
-
-                  {/* Experience */}
-                  <div>
-                    <h4 className="text-xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                      <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                      Work Experience
-                    </h4>
-                    <div className="space-y-6">
-                      {/* TechCorp Inc. - Parent Company with Multiple Roles */}
-                      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        {/* Company Header */}
-                        <div className="flex items-start justify-between mb-4 pb-4 border-b border-gray-100">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <Code2 className="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div>
-                              <h5 className="text-lg font-bold text-gray-900">TechCorp Inc.</h5>
-                              <p className="text-gray-600">Technology Company • San Francisco, CA</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                              2020 - Present
-                            </div>
-                            <p className="text-gray-600 text-sm mt-1">3+ years total</p>
-                          </div>
-                        </div>
-
-                        {/* Roles Timeline */}
-                        <div className="space-y-4">
-                          {/* Senior Position */}
-                          <div className="relative pl-6 border-l-2 border-blue-200">
-                            <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-600 rounded-full"></div>
-                            <div className="bg-blue-50 rounded-lg p-4">
-                              <div className="flex items-start justify-between mb-3">
-                                <div>
-                                  <h6 className="text-lg font-semibold text-gray-900">Senior Frontend Developer</h6>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <Badge className="bg-blue-600 text-white">Current Role</Badge>
-                                    <Badge variant="outline">Full-time</Badge>
-                                    <Badge variant="outline">Remote</Badge>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-semibold text-gray-900">2022 - Present</p>
-                                  <p className="text-gray-600 text-sm">2+ years</p>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
-                                  <ul className="text-gray-700 text-sm space-y-1">
-                                    <li>
-                                      • Led development serving <strong>100K+ users</strong>
-                                    </li>
-                                    <li>
-                                      • Improved performance by <strong>40%</strong>
-                                    </li>
-                                    <li>
-                                      • Mentored <strong>5+ junior developers</strong>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div>
-                                  <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
-                                  <div className="flex flex-wrap gap-1">
-                                    <Badge variant="secondary" className="text-xs">
-                                      React
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      TypeScript
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      Node.js
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      AWS
-                                    </Badge>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Junior Position */}
-                          <div className="relative pl-6 border-l-2 border-gray-200">
-                            <div className="absolute -left-2 top-0 w-4 h-4 bg-gray-400 rounded-full"></div>
-                            <div className="bg-gray-50 rounded-lg p-4">
-                              <div className="flex items-start justify-between mb-3">
-                                <div>
-                                  <h6 className="text-lg font-semibold text-gray-900">Frontend Developer</h6>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <Badge className="bg-gray-600 text-white">Previous</Badge>
-                                    <Badge variant="outline">Full-time</Badge>
-                                    <Badge variant="outline">Hybrid</Badge>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-semibold text-gray-900">2020 - 2022</p>
-                                  <p className="text-gray-600 text-sm">2 years</p>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
-                                  <ul className="text-gray-700 text-sm space-y-1">
-                                    <li>
-                                      • Reduced load times by <strong>60%</strong>
-                                    </li>
-                                    <li>• Built responsive applications</li>
-                                    <li>• Collaborated with UX team</li>
-                                  </ul>
-                                </div>
-                                <div>
-                                  <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
-                                  <div className="flex flex-wrap gap-1">
-                                    <Badge variant="secondary" className="text-xs">
-                                      React
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      JavaScript
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-xs">
-                                      CSS
-                                    </Badge>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Career Break */}
-                      <div className="bg-white border border-amber-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-4 pb-4 border-b border-amber-100">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                              <Terminal className="w-6 h-6 text-amber-600" />
-                            </div>
-                            <div>
-                              <h5 className="text-lg font-bold text-gray-900">Professional Development</h5>
-                              <p className="text-gray-600">Freelance & Education • Remote</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-semibold">
-                              2019 - 2020
-                            </div>
-                            <p className="text-gray-600 text-sm mt-1">1 year</p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="bg-amber-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge className="bg-amber-600 text-white text-xs">Freelance</Badge>
-                            </div>
-                            <h6 className="font-semibold text-gray-900 mb-2">Web Development Coach</h6>
-                            <ul className="text-gray-700 text-sm space-y-1">
-                              <li>
-                                • Mentored <strong>15+ developers</strong>
-                              </li>
-                              <li>
-                                • <strong>95%</strong> satisfaction rate
-                              </li>
-                              <li>• Created curriculum</li>
-                            </ul>
-                          </div>
-                          <div className="bg-amber-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge className="bg-green-600 text-white text-xs">Education</Badge>
-                            </div>
-                            <h6 className="font-semibold text-gray-900 mb-2">Advanced Certifications</h6>
-                            <ul className="text-gray-700 text-sm space-y-1">
-                              <li>• AWS Solutions Architect</li>
-                              <li>• Google UX Design</li>
-                              <li>• React Performance</li>
-                            </ul>
-                          </div>
-                          <div className="bg-amber-50 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge className="bg-purple-600 text-white text-xs">Open Source</Badge>
-                            </div>
-                            <h6 className="font-semibold text-gray-900 mb-2">Community Contributions</h6>
-                            <ul className="text-gray-700 text-sm space-y-1">
-                              <li>
-                                • <strong>5+</strong> major libraries
-                              </li>
-                              <li>
-                                • <strong>10+</strong> personal projects
-                              </li>
-                              <li>• Hackathon participation</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Previous Company */}
-                      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                              <Palette className="w-6 h-6 text-purple-600" />
-                            </div>
-                            <div>
-                              <h5 className="text-lg font-bold text-gray-900">DesignStudio Pro</h5>
-                              <p className="text-gray-600">Design Agency • New York, NY</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
-                              2017 - 2019
-                            </div>
-                            <p className="text-gray-600 text-sm mt-1">2 years</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h6 className="text-lg font-semibold text-gray-900">Junior Frontend Developer</h6>
-                              <div className="flex items-center gap-3 mt-1">
-                                <Badge className="bg-gray-600 text-white">Previous</Badge>
-                                <Badge className="bg-orange-600 text-white">Student Job</Badge>
-                                <Badge variant="outline">Full-time</Badge>
-                                <Badge variant="outline">On-site</Badge>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>
-                                  • Built websites for <strong>20+ clients</strong>
-                                </li>
-                                <li>
-                                  • <strong>98%</strong> client satisfaction
-                                </li>
-                                <li>• Learned React & modern practices</li>
-                              </ul>
-                            </div>
-                            <div>
-                              <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
-                              <div className="flex flex-wrap gap-1">
-                                <Badge variant="secondary" className="text-xs">
-                                  HTML
-                                </Badge>
-                                <Badge variant="secondary" className="text-xs">
-                                  CSS
-                                </Badge>
-                                <Badge variant="secondary" className="text-xs">
-                                  JavaScript
-                                </Badge>
-                                <Badge variant="secondary" className="text-xs">
-                                  jQuery
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Education */}
-                  <div>
-                    <h4 className="text-xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                      <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                      Education
-                    </h4>
-                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <div className="text-blue-600 font-bold text-lg">UC</div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h5 className="text-lg font-bold text-gray-900">
-                                Bachelor of Science in Computer Science
-                              </h5>
-                              <p className="text-blue-600 font-semibold">University of California, Berkeley</p>
-                              <p className="text-gray-600 text-sm mt-1">Berkeley, CA</p>
-                            </div>
-                            <div className="text-right">
-                              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                Graduated 2018
-                              </div>
-                              <Badge className="bg-blue-600 text-white text-xs mt-2">Bachelor's Degree</Badge>
-                            </div>
-                          </div>
-                          <div className="bg-blue-50 rounded-lg p-4">
-                            <h6 className="font-semibold text-gray-900 mb-2">Relevant Coursework:</h6>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                              <Badge variant="outline" className="justify-center">
-                                Data Structures
-                              </Badge>
-                              <Badge variant="outline" className="justify-center">
-                                Algorithms
-                              </Badge>
-                              <Badge variant="outline" className="justify-center">
-                                Software Engineering
-                              </Badge>
-                              <Badge variant="outline" className="justify-center">
-                                Database Systems
-                              </Badge>
-                              <Badge variant="outline" className="justify-center">
-                                Web Development
-                              </Badge>
-                              <Badge variant="outline" className="justify-center">
-                                HCI
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">Skills</h4>
-                    <div className="space-y-6">
-                      {/* Frontend Development */}
-                      <div>
-                        <h5 className="font-medium text-gray-800 mb-3">Frontend Development</h5>
-                        <div className="space-y-2">
-                          {/* Row 1 */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">JavaScript</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: i < 5 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">TypeScript</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: i < 4 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Row 2 */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">React</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: "rgb(37 99 235)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">Vue.js</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: i < 3 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Row 3 */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Palette className="w-4 h-4 text-purple-600" />
-                                <span className="font-medium text-sm">Tailwind CSS</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: i < 3 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-sm">Next.js</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: i < 4 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Backend Development */}
-                      <div>
-                        <h5 className="font-medium text-gray-800 mb-3">Backend Development</h5>
-                        <div className="space-y-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Terminal className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-sm">Node.js</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Code2 className="w-4 h-4 text-yellow-600" />
-                                <span className="font-medium text-sm">Python</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Database className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">PostgreSQL</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Database className="w-4 h-4 text-green-600" />
-                                <span className="font-medium text-sm">MongoDB</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Cloud & DevOps */}
-                      <div>
-                        <h5 className="font-medium text-gray-800 mb-3">Cloud & DevOps</h5>
-                        <div className="space-y-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Database className="w-4 h-4 text-orange-600" />
-                                <span className="font-medium text-sm">AWS</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Terminal className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm">Docker</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <GitBranch className="w-4 h-4 text-orange-600" />
-                                <span className="font-medium text-sm">Git</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Terminal className="w-4 h-4 text-gray-600" />
-                                <span className="font-medium text-sm">CI/CD</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Design & Tools */}
-                      <div>
-                        <h5 className="font-medium text-gray-800 mb-3">Design & Tools</h5>
-                        <div className="space-y-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Figma className="w-4 h-4 text-purple-600" />
-                                <span className="font-medium text-sm">Figma</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Palette className="w-4 h-4 text-red-600" />
-                                <span className="font-medium text-sm">Adobe Creative Suite</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Layers3 className="w-4 h-4 text-orange-600" />
-                                <span className="font-medium text-sm">Storybook</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Languages */}
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
-                      Languages
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-4 bg-blue-600 rounded-sm flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">EN</span>
-                            </div>
-                            <span className="font-medium text-sm">English</span>
-                          </div>
-                          <span className="text-xs text-gray-600 font-medium">C2 - Native</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-4 bg-red-600 rounded-sm flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">ES</span>
-                            </div>
-                            <span className="font-medium text-sm">Spanish</span>
-                          </div>
-                          <span className="text-xs text-gray-600 font-medium">B2 - Upper Int.</span>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-4 bg-black rounded-sm flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">DE</span>
-                            </div>
-                            <span className="font-medium text-sm">German</span>
-                          </div>
-                          <span className="text-xs text-gray-600 font-medium">A2 - Elementary</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-4 bg-blue-500 rounded-sm flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">FR</span>
-                            </div>
-                            <span className="font-medium text-sm">French</span>
-                          </div>
-                          <span className="text-xs text-gray-600 font-medium">B1 - Intermediate</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CEFR Reference */}
-                    <div className="mt-3 p-2 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-600 mb-1 font-medium">
-                        CEFR: A1-A2 Basic • B1-B2 Independent • C1-C2 Proficient
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Location, Date, and Signature Section */}
-                  <div className="mt-12 pt-6 border-t border-gray-200">
-                    <div className="flex justify-between items-start">
-                      <div className="text-left">
-                        <p className="text-gray-700 font-medium">San Francisco, CA</p>
-                        <p className="text-gray-700 font-medium">
-                          {new Date().toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-700 mb-4">Sincerely,</p>
-                        <div className="border-b border-gray-300 w-48 mb-2"></div>
-                        <p className="text-gray-600 text-sm">Signature</p>
-                        <p className="font-bold text-gray-900 mt-2">John Doe</p>
-                      </div>
-                    </div>
-                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
+                  <Calendar className="w-4 h-4 print:hidden" />
+                  {formatDate(project.startDate)} - {formatDate(project.endDate)}
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Project Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Overview & Case Studies</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                {application.projectOverview ? (
-                  <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">{application.projectOverview}</div>
-                ) : (
-                  <div className="space-y-8">
-                    {/* E-commerce Platform Project */}
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex">
-                        <div className="w-48 h-32 bg-gray-100 flex-shrink-0 overflow-hidden">
-                          <img
-                            src="/placeholder.svg?height=128&width=192&text=E-commerce+Platform"
-                            alt="E-commerce Platform"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">E-commerce Platform Redesign</h3>
-                              <p className="text-gray-600 font-medium">TechCorp Inc. • 2023</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                React
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Terminal className="w-3 h-3" />
-                                Node.js
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Palette className="w-3 h-3" />
-                                UX Design
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4 leading-relaxed">
-                            Led the complete redesign and development of a multi-vendor e-commerce platform serving
-                            50,000+ daily active users. Collaborated with UX designers to create an intuitive shopping
-                            experience that increased conversion rates by 35%.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="font-semibold text-gray-900">Challenge</p>
-                              <p className="text-gray-600">Poor user experience and low conversion rates</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Solution</p>
-                              <p className="text-gray-600">Modern React frontend with optimized checkout flow</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Result</p>
-                              <p className="text-gray-600">35% increase in conversions, 40% faster load times</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {project.description && (
+                <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">
+                  {project.description}
+                </p>
+              )}
 
-                    {/* Mobile Banking App */}
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex">
-                        <div className="w-48 h-32 bg-gray-100 flex-shrink-0 overflow-hidden">
-                          <img
-                            src="/placeholder.svg?height=128&width=192&text=Banking+App"
-                            alt="Mobile Banking App"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">Mobile Banking App UX</h3>
-                              <p className="text-gray-600 font-medium">FinanceFirst Bank • 2022</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Smartphone className="w-3 h-3" />
-                                React Native
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Figma className="w-3 h-3" />
-                                Figma
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Palette className="w-3 h-3" />
-                                User Research
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4 leading-relaxed">
-                            Designed and developed a mobile banking application focusing on accessibility and security.
-                            Conducted user research with 200+ participants to understand pain points and create an
-                            intuitive financial management experience.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="font-semibold text-gray-900">Challenge</p>
-                              <p className="text-gray-600">Complex financial features in mobile interface</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Solution</p>
-                              <p className="text-gray-600">User-centered design with progressive disclosure</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Result</p>
-                              <p className="text-gray-600">4.8/5 app store rating, 60% increase in mobile usage</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* SaaS Dashboard */}
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex">
-                        <div className="w-48 h-32 bg-gray-100 flex-shrink-0 overflow-hidden">
-                          <img
-                            src="/placeholder.svg?height=128&width=192&text=Analytics+Dashboard"
-                            alt="Analytics Dashboard"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">Analytics Dashboard SaaS</h3>
-                              <p className="text-gray-600 font-medium">DataViz Solutions • 2023</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                Vue.js
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                D3.js
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                Python
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4 leading-relaxed">
-                            Built a comprehensive analytics dashboard for enterprise clients, featuring real-time data
-                            visualization and customizable reporting. Implemented advanced charting capabilities and
-                            interactive data exploration tools.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="font-semibold text-gray-900">Challenge</p>
-                              <p className="text-gray-600">Complex data visualization for non-technical users</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Solution</p>
-                              <p className="text-gray-600">Intuitive drag-and-drop interface with smart defaults</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Result</p>
-                              <p className="text-gray-600">500+ enterprise clients, $2M ARR generated</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Design System */}
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex">
-                        <div className="w-48 h-32 bg-gray-100 flex-shrink-0 overflow-hidden">
-                          <img
-                            src="/placeholder.svg?height=128&width=192&text=Design+System"
-                            alt="Design System"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">Design System & Component Library</h3>
-                              <p className="text-gray-600 font-medium">DesignStudio Pro • 2021-2022</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Layers3 className="w-3 h-3" />
-                                Storybook
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                React
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Palette className="w-3 h-3" />
-                                Design Tokens
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4 leading-relaxed">
-                            Created a comprehensive design system and component library used across 15+ products.
-                            Established design tokens, accessibility standards, and documentation that reduced
-                            development time by 50% for new features.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="font-semibold text-gray-900">Challenge</p>
-                              <p className="text-gray-600">Inconsistent UI across multiple products</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Solution</p>
-                              <p className="text-gray-600">Unified design system with reusable components</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Result</p>
-                              <p className="text-gray-600">50% faster development, 90% design consistency</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Portfolio Website */}
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex">
-                        <div className="w-48 h-32 bg-gray-100 flex-shrink-0 overflow-hidden">
-                          <img
-                            src="/placeholder.svg?height=128&width=192&text=Portfolio+Platform"
-                            alt="Portfolio Platform"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">Creative Portfolio Platform</h3>
-                              <p className="text-gray-600 font-medium">Personal Project • 2023</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                Next.js
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Code2 className="w-3 h-3" />
-                                Framer Motion
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Palette className="w-3 h-3" />
-                                Tailwind CSS
-                              </Badge>
-                            </div>
-                          </div>
-                          <p className="text-gray-700 mb-4 leading-relaxed">
-                            Developed a modern portfolio platform for creative professionals with advanced animations,
-                            interactive galleries, and seamless content management. Features include drag-and-drop
-                            project organization and social media integration.
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="font-semibold text-gray-900">Challenge</p>
-                              <p className="text-gray-600">Showcase creative work with engaging interactions</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Solution</p>
-                              <p className="text-gray-600">Animated galleries with smooth transitions</p>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Result</p>
-                              <p className="text-gray-600">1000+ users, featured on design showcases</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Supporting Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Supporting Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center">
-                      <Download className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">AWS_Certification.pdf</p>
-                      <p className="text-sm text-gray-600">Certificate • 2.3 MB</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Download className="w-4 h-4" />
-                  </Button>
+              {project.achievements && project.achievements.length > 0 && (
+                <div className="mb-3">
+                  <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
+                  <ul className="text-sm space-y-1 print:text-base print:space-y-1">
+                    {project.achievements.map((achievement: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-green-500 mt-1 print:text-black">•</span>
+                        <span>{achievement}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center">
-                      <Edit className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Reference_Letter_Manager.pdf</p>
-                      <p className="text-sm text-gray-600">Reference • 1.8 MB</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Download className="w-4 h-4" />
-                  </Button>
+              )}
+
+              {project.technologies && project.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-3 print:gap-2">
+                  {project.technologies.map((tech: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded flex items-center justify-center">
-                      <Palette className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">UX_Design_Portfolio.pdf</p>
-                      <p className="text-sm text-gray-600">Portfolio • 5.1 MB</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Download className="w-4 h-4" />
-                  </Button>
+              )}
+
+              {project.impact && (
+                <div className="text-sm print:text-base">
+                  <span className="font-medium print:font-bold">Impact:</span> {project.impact}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              )}
+
+              {project.github && (
+                <div className="text-sm mt-2 print:text-base">
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline flex items-center gap-1 print:text-black print:no-underline"
+                  >
+                    <Github className="w-4 h-4 print:hidden" />
+                    GitHub Repository: {project.github}
+                  </a>
+                </div>
+              )}
+
+              {project.url && (
+                <div className="text-sm mt-1 print:text-base hidden print:block">
+                  <span className="font-medium">Live Demo:</span> {project.url}
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+
+  return (
+    <div className="max-w-4xl mx-auto print:max-w-none">
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4;
+            margin: 2.5cm 2cm 2.5cm 2cm;
+          }
+          
+          body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: black;
+            background: white;
+          }
+          
+          .print\\:break-before-page {
+            break-before: page;
+          }
+          
+          .print\\:hidden {
+            display: none !important;
+          }
+          
+          .print\\:block {
+            display: block !important;
+          }
+          
+          .print\\:text-base {
+            font-size: 12pt !important;
+          }
+          
+          .print\\:text-xl {
+            font-size: 14pt !important;
+          }
+          
+          .print\\:text-2xl {
+            font-size: 16pt !important;
+          }
+          
+          .print\\:font-bold {
+            font-weight: bold !important;
+          }
+          
+          .print\\:text-black {
+            color: black !important;
+          }
+          
+          .print\\:border-gray-400 {
+            border-color: #9ca3af !important;
+          }
+          
+          .print\\:bg-gray-100 {
+            background-color: #f3f4f6 !important;
+          }
+          
+          .print\\:shadow-none {
+            box-shadow: none !important;
+          }
+          
+          .print\\:border-0 {
+            border: none !important;
+          }
+          
+          .print\\:no-underline {
+            text-decoration: none !important;
+          }
+        }
+      `}</style>
+
+      <ScrollArea className="h-[calc(100vh-200px)] print:h-auto">
+        <div className="space-y-6 p-6 print:p-0 print:space-y-8">
+          <div className="text-center mb-8 print:hidden">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Bewerbungsvorschau</h1>
+            <p className="text-muted-foreground">
+              Vorschau Ihrer Bewerbungsunterlagen für {application.job_title} bei {application.company}
+            </p>
+          </div>
+
+          {renderPersonalInfo()}
+          {renderCoverLetter()}
+          {renderSummary()}
+          {renderExperience()}
+          {renderEducation()}
+          {renderSkills()}
+          {renderLanguages()}
+          {renderProjects()}
+
+          {/* Attached Documents */}
+          {application.selected_documents && application.selected_documents.length > 0 && (
+            <Card className="print:shadow-none print:border-0">
+              <CardHeader className="print:pb-4">
+                <CardTitle className="flex items-center gap-2 print:text-xl">
+                  <FileText className="w-5 h-5 print:hidden" />
+                  Angehängte Dokumente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-1 print:gap-2">
+                  {application.selected_documents.map((doc: any) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center gap-3 p-3 border rounded-lg print:border-0 print:p-1"
+                    >
+                      <FileText className="w-8 h-8 text-blue-500 print:hidden" />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm print:text-base print:font-bold">{doc.name}</div>
+                        <div className="text-xs text-muted-foreground print:text-sm print:text-black">
+                          {(doc.size / 1024).toFixed(1)} KB • {doc.section}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   )
 }

@@ -1,0 +1,135 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Setup/Getting Started" />
+
+# Job Application Manager - Storybook Setup
+
+Welcome to the Job Application Manager design system documentation. This Storybook instance provides comprehensive documentation and interactive examples of all UI components, design tokens, and patterns used in the application.
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn package manager
+
+### Installation
+
+1. **Clone the repository**
+   \`\`\`bash
+   git clone <repository-url>
+   cd job-application-manager
+   \`\`\`
+
+2. **Install dependencies**
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+3. **Start Storybook**
+   \`\`\`bash
+   npm run storybook
+   \`\`\`
+
+4. **Build Storybook for production**
+   \`\`\`bash
+   npm run build-storybook
+   \`\`\`
+
+## Project Structure
+
+\`\`\`
+├── .storybook/           # Storybook configuration
+├── stories/              # Story files
+│   ├── design-system/    # Design system documentation
+│   ├── components/       # Component stories
+│   └── setup/           # Setup and documentation
+├── components/          # React components
+│   └── ui/             # UI component library
+└── tailwind.config.ts  # Tailwind configuration with design tokens
+\`\`\`
+
+## Design System Features
+
+### 🎨 Color System
+- **Semantic Colors**: Brand, success, warning, error, info
+- **Employment Types**: Specific colors for job categories
+- **Skill Levels**: Progressive color coding
+- **Accessibility**: WCAG AA compliant contrast ratios
+
+### 📝 Typography
+- **Consistent Hierarchy**: H1-H6 with proper sizing
+- **Font Weights**: Light to bold variations
+- **Text Colors**: Primary, secondary, and muted variants
+
+### 🧩 Components
+- **Interactive Examples**: All components with live controls
+- **Variants**: Multiple styles and states
+- **Accessibility**: Built-in a11y features
+- **Responsive**: Mobile-first design approach
+
+## Development Workflow
+
+### Adding New Components
+
+1. **Create the component** in `components/ui/`
+2. **Add component story** in `stories/components/`
+3. **Document variants** and use cases
+4. **Test accessibility** with built-in a11y addon
+
+### Updating Design Tokens
+
+1. **Modify** `tailwind.config.ts`
+2. **Update** color/typography stories
+3. **Test** component integration
+4. **Document** changes in relevant stories
+
+### Real-time Updates
+
+Storybook automatically reloads when you make changes to:
+- Component files
+- Story files
+- Tailwind configuration
+- CSS files
+
+## Available Addons
+
+- **Controls**: Interactive component props
+- **Docs**: Auto-generated documentation
+- **Viewport**: Responsive testing
+- **A11y**: Accessibility testing
+- **Themes**: Light/dark mode switching
+
+## Deployment
+
+### Build for Production
+\`\`\`bash
+npm run build-storybook
+\`\`\`
+
+### Serve Static Build
+\`\`\`bash
+npm run storybook:serve
+\`\`\`
+
+The built Storybook can be deployed to any static hosting service like Vercel, Netlify, or GitHub Pages.
+
+## Contributing
+
+1. **Follow naming conventions** for stories and components
+2. **Document all props** and variants
+3. **Include accessibility considerations**
+4. **Test across different viewports**
+5. **Update this documentation** when adding new features
+
+## Support
+
+For questions or issues:
+- Check existing component stories for examples
+- Review design system documentation
+- Refer to component source code in `components/ui/`
+
+---
+
+*This Storybook instance is automatically updated with every change to the design system.*
+\`\`\`
