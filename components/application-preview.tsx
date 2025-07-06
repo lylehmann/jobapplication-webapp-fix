@@ -225,65 +225,82 @@ export function ApplicationPreview({ application, onBack, onEdit }: ApplicationP
             </CardHeader>
             <CardContent>
               <div className="bg-white shadow-sm border rounded-lg overflow-hidden">
-                {/* Modern Resume Header - Similar to Cover Letter */}
-                <div className="bg-gradient-to-r from-slate-50 to-gray-100 p-8 border-b">
-                  <div className="flex items-start gap-8">
+                {/* Modern Professional Resume Header */}
+                <div className="bg-white border-b-2 border-gray-100 p-8">
+                  <div className="flex items-center gap-8">
                     {/* Profile Picture */}
                     <div className="flex-shrink-0">
-                      <div className="w-32 h-32 rounded-full border-4 border-gray-300 shadow-lg overflow-hidden bg-white">
+                      <div className="w-28 h-28 rounded-full border-3 border-blue-200 shadow-md overflow-hidden bg-white">
                         <img
-                          src="/placeholder.svg?height=128&width=128&text=Profile"
+                          src="/placeholder.svg?height=112&width=112&text=Profile"
                           alt="John Doe"
                           className="w-full h-full object-cover"
                         />
                       </div>
                     </div>
 
-                    {/* Personal Information */}
+                    {/* Personal Information - Modern Layout */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <h2 className="text-3xl font-bold text-gray-900">John Doe</h2>
-                          <p className="text-xl text-gray-600">Senior Frontend Developer</p>
-                        </div>
+                      <div className="mb-4">
+                        <h2 className="text-4xl font-bold text-gray-900 mb-1">John Doe</h2>
+                        <p className="text-xl text-blue-600 font-medium">Senior Frontend Developer</p>
+                        <p className="text-gray-600 mt-1">5+ years experience • San Francisco, CA</p>
+                      </div>
 
-                        {/* Contact Details - Right aligned like cover letter */}
-                        <div className="text-right space-y-1 text-sm">
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <Mail className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">john.doe@email.com</span>
+                      {/* Contact Grid - Modern Layout */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Mail className="w-4 h-4 text-blue-600" />
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <Phone className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">(555) 123-4567</span>
+                          <div>
+                            <p className="text-gray-500 text-xs">Email</p>
+                            <p className="text-gray-900 font-medium">john.doe@email.com</p>
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <MapPin className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">San Francisco, CA</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Phone className="w-4 h-4 text-blue-600" />
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <Linkedin className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">linkedin.com/in/johndoe</span>
+                          <div>
+                            <p className="text-gray-500 text-xs">Phone</p>
+                            <p className="text-gray-900 font-medium">(555) 123-4567</p>
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <Globe className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">johndoe.dev</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Linkedin className="w-4 h-4 text-blue-600" />
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-                              <Github className="w-3 h-3 text-blue-600" />
-                            </div>
-                            <span className="text-gray-700">github.com/johndoe</span>
+                          <div>
+                            <p className="text-gray-500 text-xs">LinkedIn</p>
+                            <p className="text-gray-900 font-medium">linkedin.com/in/johndoe</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Globe className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs">Portfolio</p>
+                            <p className="text-gray-900 font-medium">johndoe.dev</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <Github className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs">GitHub</p>
+                            <p className="text-gray-900 font-medium">github.com/johndoe</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <MapPin className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs">Location</p>
+                            <p className="text-gray-900 font-medium">San Francisco, CA</p>
                           </div>
                         </div>
                       </div>
@@ -307,201 +324,264 @@ export function ApplicationPreview({ application, onBack, onEdit }: ApplicationP
 
                   {/* Experience */}
                   <div>
-                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                    <h4 className="text-xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                       Work Experience
                     </h4>
-                    <div className="space-y-8">
-                      {/* TechCorp Inc. - Multiple Positions */}
-                      <div className="space-y-4">
+                    <div className="space-y-6">
+                      {/* TechCorp Inc. - Parent Company with Multiple Roles */}
+                      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
                         {/* Company Header */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h5 className="font-semibold text-gray-900 text-lg">TechCorp Inc.</h5>
-                              <p className="text-gray-600">San Francisco, CA</p>
+                        <div className="flex items-start justify-between mb-4 pb-4 border-b border-gray-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <Code2 className="w-6 h-6 text-blue-600" />
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600 font-medium">2020 - Present</p>
-                              <p className="text-xs text-gray-500">3+ years</p>
+                            <div>
+                              <h5 className="text-lg font-bold text-gray-900">TechCorp Inc.</h5>
+                              <p className="text-gray-600">Technology Company • San Francisco, CA</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                              2020 - Present
+                            </div>
+                            <p className="text-gray-600 text-sm mt-1">3+ years total</p>
+                          </div>
+                        </div>
+
+                        {/* Roles Timeline */}
+                        <div className="space-y-4">
+                          {/* Senior Position */}
+                          <div className="relative pl-6 border-l-2 border-blue-200">
+                            <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-600 rounded-full"></div>
+                            <div className="bg-blue-50 rounded-lg p-4">
+                              <div className="flex items-start justify-between mb-3">
+                                <div>
+                                  <h6 className="text-lg font-semibold text-gray-900">Senior Frontend Developer</h6>
+                                  <div className="flex items-center gap-3 mt-1">
+                                    <Badge className="bg-blue-600 text-white">Current Role</Badge>
+                                    <Badge variant="outline">Full-time</Badge>
+                                    <Badge variant="outline">Remote</Badge>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-semibold text-gray-900">2022 - Present</p>
+                                  <p className="text-gray-600 text-sm">2+ years</p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
+                                  <ul className="text-gray-700 text-sm space-y-1">
+                                    <li>
+                                      • Led development serving <strong>100K+ users</strong>
+                                    </li>
+                                    <li>
+                                      • Improved performance by <strong>40%</strong>
+                                    </li>
+                                    <li>
+                                      • Mentored <strong>5+ junior developers</strong>
+                                    </li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
+                                  <div className="flex flex-wrap gap-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                      React
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      TypeScript
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      Node.js
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      AWS
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Multiple Positions within Company */}
-                          <div className="space-y-4 mt-4">
-                            {/* Senior Position */}
-                            <div className="ml-4 border-l-2 border-blue-200 pl-4">
-                              <div className="flex justify-between items-start mb-2">
+                          {/* Junior Position */}
+                          <div className="relative pl-6 border-l-2 border-gray-200">
+                            <div className="absolute -left-2 top-0 w-4 h-4 bg-gray-400 rounded-full"></div>
+                            <div className="bg-gray-50 rounded-lg p-4">
+                              <div className="flex items-start justify-between mb-3">
                                 <div>
-                                  <h6 className="font-medium text-gray-900">Senior Frontend Developer</h6>
-                                  <div className="flex gap-1 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      Full-time
+                                  <h6 className="text-lg font-semibold text-gray-900">Frontend Developer</h6>
+                                  <div className="flex items-center gap-3 mt-1">
+                                    <Badge className="bg-gray-600 text-white">Previous</Badge>
+                                    <Badge variant="outline">Full-time</Badge>
+                                    <Badge variant="outline">Hybrid</Badge>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-semibold text-gray-900">2020 - 2022</p>
+                                  <p className="text-gray-600 text-sm">2 years</p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
+                                  <ul className="text-gray-700 text-sm space-y-1">
+                                    <li>
+                                      • Reduced load times by <strong>60%</strong>
+                                    </li>
+                                    <li>• Built responsive applications</li>
+                                    <li>• Collaborated with UX team</li>
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
+                                  <div className="flex flex-wrap gap-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                      React
                                     </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      Remote
+                                    <Badge variant="secondary" className="text-xs">
+                                      JavaScript
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      CSS
                                     </Badge>
                                   </div>
                                 </div>
-                                <p className="text-sm text-gray-600 font-medium">2022 - Present</p>
                               </div>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>• Led development of customer-facing web applications serving 100K+ users</li>
-                                <li>• Improved application performance by 40% through code optimization</li>
-                                <li>• Mentored junior developers and established coding standards</li>
-                              </ul>
-                            </div>
-
-                            {/* Junior Position */}
-                            <div className="ml-4 border-l-2 border-gray-200 pl-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h6 className="font-medium text-gray-900">Frontend Developer</h6>
-                                  <div className="flex gap-1 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      Full-time
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      Hybrid
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">2020 - 2022</p>
-                              </div>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>• Developed responsive web applications using React and TypeScript</li>
-                                <li>• Collaborated with UX designers to implement pixel-perfect designs</li>
-                                <li>• Reduced page load times by 60% through performance optimization</li>
-                              </ul>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Career Break / Gap Year */}
-                      <div className="space-y-4">
-                        <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h5 className="font-semibold text-gray-900 text-lg">
-                                Professional Development & Education
-                              </h5>
-                              <p className="text-gray-600">Career Break</p>
+                      {/* Career Break */}
+                      <div className="bg-white border border-amber-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-4 pb-4 border-b border-amber-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                              <Terminal className="w-6 h-6 text-amber-600" />
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600 font-medium">2019 - 2020</p>
-                              <p className="text-xs text-gray-500">1 year</p>
+                            <div>
+                              <h5 className="text-lg font-bold text-gray-900">Professional Development</h5>
+                              <p className="text-gray-600">Freelance & Education • Remote</p>
                             </div>
                           </div>
-
-                          {/* Gap Year Activities */}
-                          <div className="space-y-4 mt-4">
-                            {/* Freelance Coaching */}
-                            <div className="ml-4 border-l-2 border-amber-300 pl-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h6 className="font-medium text-gray-900">Freelance Web Development Coach</h6>
-                                  <div className="flex gap-1 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      Part-time
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      Remote
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">2019 - 2020</p>
-                              </div>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>• Mentored 15+ junior developers in React and JavaScript fundamentals</li>
-                                <li>• Created curriculum for bootcamp-style web development courses</li>
-                                <li>• Maintained 95% student satisfaction rate across all programs</li>
-                              </ul>
+                          <div className="text-right">
+                            <div className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-semibold">
+                              2019 - 2020
                             </div>
+                            <p className="text-gray-600 text-sm mt-1">1 year</p>
+                          </div>
+                        </div>
 
-                            {/* Advanced Courses */}
-                            <div className="ml-4 border-l-2 border-amber-300 pl-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h6 className="font-medium text-gray-900">Advanced Certification Programs</h6>
-                                  <div className="flex gap-1 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      Self-paced
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      Online
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">2019 - 2020</p>
-                              </div>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>• AWS Solutions Architect Professional Certification</li>
-                                <li>• Google UX Design Professional Certificate</li>
-                                <li>• Advanced React Patterns and Performance Optimization</li>
-                              </ul>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-amber-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge className="bg-amber-600 text-white text-xs">Freelance</Badge>
                             </div>
-
-                            {/* Personal Projects */}
-                            <div className="ml-4 border-l-2 border-amber-300 pl-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h6 className="font-medium text-gray-900">Open Source Contributions</h6>
-                                  <div className="flex gap-1 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      Volunteer
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      Remote
-                                    </Badge>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">2019 - 2020</p>
-                              </div>
-                              <ul className="text-gray-700 text-sm space-y-1">
-                                <li>• Contributed to 5+ major open source React libraries</li>
-                                <li>• Built and maintained personal portfolio showcasing 10+ projects</li>
-                                <li>• Participated in hackathons and developer community events</li>
-                              </ul>
+                            <h6 className="font-semibold text-gray-900 mb-2">Web Development Coach</h6>
+                            <ul className="text-gray-700 text-sm space-y-1">
+                              <li>
+                                • Mentored <strong>15+ developers</strong>
+                              </li>
+                              <li>
+                                • <strong>95%</strong> satisfaction rate
+                              </li>
+                              <li>• Created curriculum</li>
+                            </ul>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge className="bg-green-600 text-white text-xs">Education</Badge>
                             </div>
+                            <h6 className="font-semibold text-gray-900 mb-2">Advanced Certifications</h6>
+                            <ul className="text-gray-700 text-sm space-y-1">
+                              <li>• AWS Solutions Architect</li>
+                              <li>• Google UX Design</li>
+                              <li>• React Performance</li>
+                            </ul>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge className="bg-purple-600 text-white text-xs">Open Source</Badge>
+                            </div>
+                            <h6 className="font-semibold text-gray-900 mb-2">Community Contributions</h6>
+                            <ul className="text-gray-700 text-sm space-y-1">
+                              <li>
+                                • <strong>5+</strong> major libraries
+                              </li>
+                              <li>
+                                • <strong>10+</strong> personal projects
+                              </li>
+                              <li>• Hackathon participation</li>
+                            </ul>
                           </div>
                         </div>
                       </div>
 
                       {/* Previous Company */}
-                      <div className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h5 className="font-semibold text-gray-900 text-lg">DesignStudio Pro</h5>
-                              <p className="text-gray-600">New York, NY</p>
+                      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                              <Palette className="w-6 h-6 text-purple-600" />
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600 font-medium">2017 - 2019</p>
-                              <p className="text-xs text-gray-500">2 years</p>
+                            <div>
+                              <h5 className="text-lg font-bold text-gray-900">DesignStudio Pro</h5>
+                              <p className="text-gray-600">Design Agency • New York, NY</p>
                             </div>
                           </div>
-
-                          {/* Single Position */}
-                          <div className="ml-4 border-l-2 border-gray-200 pl-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h6 className="font-medium text-gray-900">Junior Frontend Developer</h6>
-                                <div className="flex gap-1 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    Full-time
-                                  </Badge>
-                                  <Badge variant="outline" className="text-xs">
-                                    On-site
-                                  </Badge>
-                                </div>
-                              </div>
-                              <p className="text-sm text-gray-600 font-medium">2017 - 2019</p>
+                          <div className="text-right">
+                            <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
+                              2017 - 2019
                             </div>
-                            <ul className="text-gray-700 text-sm space-y-1">
-                              <li>• Built responsive websites for 20+ clients using HTML, CSS, and JavaScript</li>
-                              <li>• Collaborated with design team to implement pixel-perfect mockups</li>
-                              <li>• Learned React and modern development practices</li>
-                            </ul>
+                            <p className="text-gray-600 text-sm mt-1">2 years</p>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h6 className="text-lg font-semibold text-gray-900">Junior Frontend Developer</h6>
+                              <div className="flex items-center gap-3 mt-1">
+                                <Badge className="bg-gray-600 text-white">Previous</Badge>
+                                <Badge className="bg-orange-600 text-white">Student Job</Badge>
+                                <Badge variant="outline">Full-time</Badge>
+                                <Badge variant="outline">On-site</Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h6 className="font-medium text-gray-900 mb-2 block">Key Achievements:</h6>
+                              <ul className="text-gray-700 text-sm space-y-1">
+                                <li>
+                                  • Built websites for <strong>20+ clients</strong>
+                                </li>
+                                <li>
+                                  • <strong>98%</strong> client satisfaction
+                                </li>
+                                <li>• Learned React & modern practices</li>
+                              </ul>
+                            </div>
+                            <div>
+                              <h6 className="font-medium text-gray-900 mb-2 block">Technologies:</h6>
+                              <div className="flex flex-wrap gap-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  HTML
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  CSS
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  JavaScript
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  jQuery
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -510,16 +590,55 @@ export function ApplicationPreview({ application, onBack, onEdit }: ApplicationP
 
                   {/* Education */}
                   <div>
-                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                    <h4 className="text-xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                       Education
                     </h4>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h5 className="font-semibold text-gray-900">Bachelor of Science in Computer Science</h5>
-                          <p className="text-gray-600">University of California, Berkeley</p>
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <div className="text-blue-600 font-bold text-lg">UC</div>
                         </div>
-                        <p className="text-sm text-gray-600 font-medium">2018</p>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h5 className="text-lg font-bold text-gray-900">
+                                Bachelor of Science in Computer Science
+                              </h5>
+                              <p className="text-blue-600 font-semibold">University of California, Berkeley</p>
+                              <p className="text-gray-600 text-sm mt-1">Berkeley, CA</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                Graduated 2018
+                              </div>
+                              <Badge className="bg-blue-600 text-white text-xs mt-2">Bachelor's Degree</Badge>
+                            </div>
+                          </div>
+                          <div className="bg-blue-50 rounded-lg p-4">
+                            <h6 className="font-semibold text-gray-900 mb-2">Relevant Coursework:</h6>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                              <Badge variant="outline" className="justify-center">
+                                Data Structures
+                              </Badge>
+                              <Badge variant="outline" className="justify-center">
+                                Algorithms
+                              </Badge>
+                              <Badge variant="outline" className="justify-center">
+                                Software Engineering
+                              </Badge>
+                              <Badge variant="outline" className="justify-center">
+                                Database Systems
+                              </Badge>
+                              <Badge variant="outline" className="justify-center">
+                                Web Development
+                              </Badge>
+                              <Badge variant="outline" className="justify-center">
+                                HCI
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -531,94 +650,345 @@ export function ApplicationPreview({ application, onBack, onEdit }: ApplicationP
                       {/* Frontend Development */}
                       <div>
                         <h5 className="font-medium text-gray-800 mb-3">Frontend Development</h5>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className="flex items-center gap-1">
-                            <Code2 className="w-3 h-3" />
-                            JavaScript
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Code2 className="w-3 h-3" />
-                            TypeScript
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Code2 className="w-3 h-3" />
-                            React
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Code2 className="w-3 h-3" />
-                            Vue.js
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Palette className="w-3 h-3" />
-                            Tailwind CSS
-                          </Badge>
+                        <div className="space-y-2">
+                          {/* Row 1 */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">JavaScript</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: i < 5 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">TypeScript</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: i < 4 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Row 2 */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">React</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: "rgb(37 99 235)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">Vue.js</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: i < 3 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Row 3 */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Palette className="w-4 h-4 text-purple-600" />
+                                <span className="font-medium text-sm">Tailwind CSS</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: i < 3 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-green-600" />
+                                <span className="font-medium text-sm">Next.js</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: i < 4 ? "rgb(37 99 235)" : "rgb(209 213 219)" }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       {/* Backend Development */}
                       <div>
                         <h5 className="font-medium text-gray-800 mb-3">Backend Development</h5>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className="flex items-center gap-1">
-                            <Terminal className="w-3 h-3" />
-                            Node.js
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Code2 className="w-3 h-3" />
-                            Python
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Database className="w-3 h-3" />
-                            PostgreSQL
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Database className="w-3 h-3" />
-                            MongoDB
-                          </Badge>
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Terminal className="w-4 h-4 text-green-600" />
+                                <span className="font-medium text-sm">Node.js</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Code2 className="w-4 h-4 text-yellow-600" />
+                                <span className="font-medium text-sm">Python</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Database className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">PostgreSQL</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Database className="w-4 h-4 text-green-600" />
+                                <span className="font-medium text-sm">MongoDB</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       {/* Cloud & DevOps */}
                       <div>
                         <h5 className="font-medium text-gray-800 mb-3">Cloud & DevOps</h5>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className="flex items-center gap-1">
-                            <Database className="w-3 h-3" />
-                            AWS
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Terminal className="w-3 h-3" />
-                            Docker
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <GitBranch className="w-3 h-3" />
-                            Git
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Terminal className="w-3 h-3" />
-                            CI/CD
-                          </Badge>
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Database className="w-4 h-4 text-orange-600" />
+                                <span className="font-medium text-sm">AWS</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Terminal className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-sm">Docker</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <GitBranch className="w-4 h-4 text-orange-600" />
+                                <span className="font-medium text-sm">Git</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Terminal className="w-4 h-4 text-gray-600" />
+                                <span className="font-medium text-sm">CI/CD</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       {/* Design & Tools */}
                       <div>
                         <h5 className="font-medium text-gray-800 mb-3">Design & Tools</h5>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className="flex items-center gap-1">
-                            <Figma className="w-3 h-3" />
-                            Figma
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Palette className="w-3 h-3" />
-                            Adobe Creative Suite
-                          </Badge>
-                          <Badge className="flex items-center gap-1">
-                            <Layers3 className="w-3 h-3" />
-                            Storybook
-                          </Badge>
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Figma className="w-4 h-4 text-purple-600" />
+                                <span className="font-medium text-sm">Figma</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Palette className="w-4 h-4 text-red-600" />
+                                <span className="font-medium text-sm">Adobe Creative Suite</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Layers3 className="w-4 h-4 text-orange-600" />
+                                <span className="font-medium text-sm">Storybook</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Languages */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                      Languages
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-4 bg-blue-600 rounded-sm flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">EN</span>
+                            </div>
+                            <span className="font-medium text-sm">English</span>
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">C2 - Native</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-4 bg-red-600 rounded-sm flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">ES</span>
+                            </div>
+                            <span className="font-medium text-sm">Spanish</span>
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">B2 - Upper Int.</span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-4 bg-black rounded-sm flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">DE</span>
+                            </div>
+                            <span className="font-medium text-sm">German</span>
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">A2 - Elementary</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-4 bg-blue-500 rounded-sm flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">FR</span>
+                            </div>
+                            <span className="font-medium text-sm">French</span>
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">B1 - Intermediate</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CEFR Reference */}
+                    <div className="mt-3 p-2 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-gray-600 mb-1 font-medium">
+                        CEFR: A1-A2 Basic • B1-B2 Independent • C1-C2 Proficient
+                      </p>
                     </div>
                   </div>
 
