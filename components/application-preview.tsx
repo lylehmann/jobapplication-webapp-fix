@@ -18,6 +18,7 @@ import {
   ExternalLink,
   FileText,
   Award,
+  Briefcase,
 } from "lucide-react"
 import type { Database } from "@/lib/database.types"
 
@@ -40,71 +41,105 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
     return date.toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })
   }
 
-  const renderPersonalInfo = () => (
-    <Card className="print:shadow-none print:border-0">
-      <CardHeader className="print:pb-4">
-        <CardTitle className="flex items-center gap-2 text-center print:text-2xl">
-          <User className="w-5 h-5 print:hidden" />
-          {application.personal_info?.fullName || "Name nicht angegeben"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
-          {application.personal_info?.email && (
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.email}</span>
-            </div>
-          )}
-          {application.personal_info?.phone && (
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.phone}</span>
-            </div>
-          )}
-          {application.personal_info?.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.location}</span>
-            </div>
-          )}
-          {application.personal_info?.portfolio && (
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.portfolio}</span>
-            </div>
-          )}
-          {application.personal_info?.github && (
-            <div className="flex items-center gap-2">
-              <Github className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.github}</span>
-            </div>
-          )}
-          {application.personal_info?.linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-muted-foreground print:hidden" />
-              <span className="text-sm">{application.personal_info.linkedin}</span>
-            </div>
-          )}
-        </div>
+  const getEmploymentTypeBadge = (type: string) => {
+    const types = {
+      "full-time": { label: "Vollzeit", color: "bg-green-100 text-green-800 print:bg-gray-100 print:text-black" },
+      "part-time": { label: "Teilzeit", color: "bg-blue-100 text-blue-800 print:bg-gray-100 print:text-black" },
+      "student-job": {
+        label: "Studentenjob",
+        color: "bg-purple-100 text-purple-800 print:bg-gray-100 print:text-black",
+      },
+      internship: { label: "Praktikum", color: "bg-indigo-100 text-indigo-800 print:bg-gray-100 print:text-black" },
+      freelance: { label: "Freiberuflich", color: "bg-teal-100 text-teal-800 print:bg-gray-100 print:text-black" },
+      volunteer: {
+        label: "Freiwilligenarbeit",
+        color: "bg-pink-100 text-pink-800 print:bg-gray-100 print:text-black",
+      },
+      travel: { label: "Reisen", color: "bg-orange-100 text-orange-800 print:bg-gray-100 print:text-black" },
+      course: { label: "Weiterbildung", color: "bg-yellow-100 text-yellow-800 print:bg-gray-100 print:text-black" },
+      project: {
+        label: "Persönliches Projekt",
+        color: "bg-cyan-100 text-cyan-800 print:bg-gray-100 print:text-black",
+      },
+      other: { label: "Sonstiges", color: "bg-gray-100 text-gray-800 print:bg-gray-100 print:text-black" },
+    }
+    return types[type as keyof typeof types] || { label: type, color: "bg-gray-100 text-gray-800" }
+  }
 
-        <Separator className="print:border-gray-400" />
+  const renderPersonalInfo = () => {
+    const statusLabel =
+      application.status && typeof application.status === "string"
+        ? application.status.charAt(0).toUpperCase() + application.status.slice(1)
+        : null
 
-        <div className="flex items-center justify-between print:justify-center print:text-center">
-          <div>
-            <div className="font-medium text-lg print:text-xl">{application.job_title}</div>
-            <div className="text-sm text-muted-foreground flex items-center gap-1 print:justify-center">
-              <Building2 className="w-4 h-4 print:hidden" />
-              {application.company}
-            </div>
+    return (
+      <Card className="print:shadow-none print:border-0">
+        <CardHeader className="print:pb-4">
+          <CardTitle className="flex items-center gap-2 text-center print:text-2xl">
+            <User className="w-5 h-5 print:hidden" />
+            {application.personal_info?.fullName || "Name nicht angegeben"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
+            {application.personal_info?.email && (
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.email}</span>
+              </div>
+            )}
+            {application.personal_info?.phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.phone}</span>
+              </div>
+            )}
+            {application.personal_info?.location && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.location}</span>
+              </div>
+            )}
+            {application.personal_info?.portfolio && (
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.portfolio}</span>
+              </div>
+            )}
+            {application.personal_info?.github && (
+              <div className="flex items-center gap-2">
+                <Github className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.github}</span>
+              </div>
+            )}
+            {application.personal_info?.linkedin && (
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-muted-foreground print:hidden" />
+                <span className="text-sm">{application.personal_info.linkedin}</span>
+              </div>
+            )}
           </div>
-          <Badge variant="outline" className="print:hidden">
-            {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
-          </Badge>
-        </div>
-      </CardContent>
-    </Card>
-  )
+
+          <Separator className="print:border-gray-400" />
+
+          <div className="flex items-center justify-between print:justify-center print:text-center">
+            <div>
+              <div className="font-medium text-lg print:text-xl">{application.job_title}</div>
+              <div className="text-sm text-muted-foreground flex items-center gap-1 print:justify-center">
+                <Building2 className="w-4 h-4 print:hidden" />
+                {application.company}
+              </div>
+            </div>
+            {statusLabel && (
+              <Badge variant="outline" className="print:hidden">
+                {statusLabel}
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const renderCoverLetter = () => (
     <Card className="print:shadow-none print:border-0 print:break-before-page">
@@ -177,67 +212,160 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
       </Card>
     )
 
-  const renderExperience = () =>
-    application.resume_data?.experience &&
-    application.resume_data.experience.length > 0 && (
+  const renderExperience = () => {
+    const experiences = application.resume_data?.experience || []
+    if (experiences.length === 0) return null
+
+    // Group experiences by company
+    const groupedExperiences = experiences.reduce((acc: any, exp: any) => {
+      const company = exp.company || "Unbekanntes Unternehmen"
+      if (!acc[company]) {
+        acc[company] = []
+      }
+      acc[company].push(exp)
+      return acc
+    }, {})
+
+    // Sort experiences within each company by start date (newest first)
+    Object.keys(groupedExperiences).forEach((company) => {
+      groupedExperiences[company].sort((a: any, b: any) => {
+        const dateA = new Date(a.startDate || "1900-01")
+        const dateB = new Date(b.startDate || "1900-01")
+        return dateB.getTime() - dateA.getTime()
+      })
+    })
+
+    return (
       <Card className="print:shadow-none print:border-0">
         <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Berufserfahrung</CardTitle>
+          <CardTitle className="flex items-center gap-2 print:text-xl">
+            <Briefcase className="w-5 h-5 print:hidden" />
+            Berufserfahrung & Aktivitäten
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 print:space-y-4">
-          {application.resume_data.experience.map((exp: any) => (
-            <div key={exp.id} className="border-l-2 border-blue-200 pl-4 print:border-l-4 print:border-gray-400">
-              <div className="flex items-start justify-between mb-2 print:block">
-                <div>
-                  <h4 className="font-medium print:text-base print:font-bold">{exp.title}</h4>
-                  <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base">
-                    <Building2 className="w-4 h-4 print:hidden" />
-                    {exp.company}
-                    {exp.location && ` • ${exp.location}`}
+        <CardContent className="space-y-8 print:space-y-6">
+          {Object.entries(groupedExperiences).map(([company, companyExperiences]: [string, any]) => (
+            <div key={company} className="space-y-4">
+              {/* Company Header */}
+              <div className="flex items-center gap-3 pb-2 border-b border-gray-200 print:border-gray-400">
+                <Building2 className="w-5 h-5 text-gray-600 print:hidden" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-lg print:text-base print:font-bold">{company}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm text-gray-600 print:text-black print:text-base">
+                      {companyExperiences.length} Position{companyExperiences.length !== 1 ? "en" : ""}
+                    </span>
+                    <div className="flex gap-1 flex-wrap">
+                      {companyExperiences.map((exp: any) => {
+                        const employmentType = getEmploymentTypeBadge(exp.employmentType)
+                        return (
+                          <Badge key={exp.id} className={employmentType.color} variant="secondary">
+                            {employmentType.label}
+                          </Badge>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-                <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
-                  <Calendar className="w-4 h-4 print:hidden" />
-                  {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
                 </div>
               </div>
 
-              {exp.description && (
-                <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">{exp.description}</p>
-              )}
-
-              {exp.achievements && exp.achievements.length > 0 && (
-                <div className="mb-3">
-                  <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
-                  <ul className="text-sm space-y-1 print:text-base print:space-y-1">
-                    {exp.achievements.map((achievement: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-blue-500 mt-1 print:text-black">•</span>
-                        <span>{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {exp.technologies && exp.technologies.length > 0 && (
-                <div className="flex flex-wrap gap-1 print:gap-2">
-                  {exp.technologies.map((tech: string, index: number) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+              {/* Company Positions */}
+              <div className="space-y-6 print:space-y-4">
+                {companyExperiences.map((exp: any, index: number) => {
+                  const employmentType = getEmploymentTypeBadge(exp.employmentType)
+                  return (
+                    <div
+                      key={exp.id}
+                      className="border-l-2 border-blue-200 pl-4 print:border-l-4 print:border-gray-400"
                     >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              )}
+                      <div className="flex items-start justify-between mb-2 print:block">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h5 className="font-medium print:text-base print:font-bold">{exp.title}</h5>
+                            <Badge className={employmentType.color}>{employmentType.label}</Badge>
+                            {companyExperiences.length > 1 && (
+                              <Badge variant="outline" className="text-xs print:bg-gray-100 print:text-black">
+                                Position #{index + 1}
+                              </Badge>
+                            )}
+                          </div>
+                          {exp.location && (
+                            <div className="text-sm text-muted-foreground print:text-black print:text-base">
+                              {exp.location}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
+                          <Calendar className="w-4 h-4 print:hidden" />
+                          {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
+                        </div>
+                      </div>
+
+                      {exp.description && (
+                        <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">
+                          {exp.description}
+                        </p>
+                      )}
+
+                      {exp.achievements && exp.achievements.length > 0 && (
+                        <div className="mb-3">
+                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
+                          <ul className="text-sm space-y-1 print:text-base print:space-y-1">
+                            {exp.achievements.map((achievement: string, achievementIndex: number) => (
+                              <li key={achievementIndex} className="flex items-start gap-2">
+                                <span className="text-blue-500 mt-1 print:text-black">•</span>
+                                <span>{achievement}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {exp.technologies && exp.technologies.length > 0 && (
+                        <div className="mb-3">
+                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Technologien:</div>
+                          <div className="flex flex-wrap gap-1 print:gap-2">
+                            {exp.technologies.map((tech: string, techIndex: number) => (
+                              <Badge
+                                key={techIndex}
+                                variant="secondary"
+                                className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                              >
+                                {tech}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {exp.skills && exp.skills.length > 0 && (
+                        <div className="mb-3">
+                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">
+                            Erworbene Fähigkeiten:
+                          </div>
+                          <div className="flex flex-wrap gap-1 print:gap-2">
+                            {exp.skills.map((skill: string, skillIndex: number) => (
+                              <Badge
+                                key={skillIndex}
+                                variant="outline"
+                                className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                              >
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           ))}
         </CardContent>
       </Card>
     )
+  }
 
   const renderEducation = () =>
     application.resume_data?.education?.degree && (

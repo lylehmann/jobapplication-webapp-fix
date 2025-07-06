@@ -37,26 +37,26 @@ export function ExportImportManager({ application, onUpdate }: ExportImportManag
       case "cover-letter":
         data = {
           type: "cover-letter",
-          data: application.cover_letter_data,
-          personal_info: application.personal_info,
-          job_title: application.job_title,
-          company: application.company,
+          data: application.cover_letter_data || {},
+          personal_info: application.personal_info || {},
+          job_title: application.job_title || "",
+          company: application.company || "",
           exported_at: new Date().toISOString(),
         }
         break
       case "resume":
         data = {
           type: "resume",
-          data: application.resume_data,
-          personal_info: application.personal_info,
+          data: application.resume_data || {},
+          personal_info: application.personal_info || {},
           exported_at: new Date().toISOString(),
         }
         break
       case "projects":
         data = {
           type: "projects",
-          data: application.projects_data,
-          personal_info: application.personal_info,
+          data: application.projects_data || [],
+          personal_info: application.personal_info || {},
           exported_at: new Date().toISOString(),
         }
         break
@@ -185,9 +185,16 @@ ${resume.summary || ""}
             ? new Date(exp.endDate + "-01").toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })
             : ""
 
+        const employmentTypeMap = {
+          "full-time": "Vollzeit",
+          "part-time": "Teilzeit",
+          "student-job": "Studentenjob",
+          "gap-year": "Gap Year",
+        }
+
         markdown += `
 ### ${exp.title} | ${exp.company}
-**${startDate} - ${endDate}** | ${exp.location || ""}
+**${startDate} - ${endDate}** | ${exp.location || ""} | ${employmentTypeMap[exp.employmentType as keyof typeof employmentTypeMap] || exp.employmentType || ""}
 
 ${exp.description || ""}
 

@@ -28,8 +28,12 @@ import {
   File,
   X,
   Paperclip,
+  Building2,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import type { Database } from "@/lib/database.types"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
@@ -38,6 +42,20 @@ interface ApplicationEditorProps {
   application: Application
   onUpdate: (updates: Partial<Application>) => Promise<void> | void
 }
+
+// Employment types with enhanced categorization
+const EMPLOYMENT_TYPES = [
+  { value: "full-time", label: "Vollzeit", color: "bg-green-100 text-green-800", category: "employment" },
+  { value: "part-time", label: "Teilzeit", color: "bg-blue-100 text-blue-800", category: "employment" },
+  { value: "student-job", label: "Studentenjob", color: "bg-purple-100 text-purple-800", category: "employment" },
+  { value: "internship", label: "Praktikum", color: "bg-indigo-100 text-indigo-800", category: "employment" },
+  { value: "freelance", label: "Freiberuflich", color: "bg-teal-100 text-teal-800", category: "employment" },
+  { value: "volunteer", label: "Freiwilligenarbeit", color: "bg-pink-100 text-pink-800", category: "gap-year" },
+  { value: "travel", label: "Reisen", color: "bg-orange-100 text-orange-800", category: "gap-year" },
+  { value: "course", label: "Weiterbildung", color: "bg-yellow-100 text-yellow-800", category: "gap-year" },
+  { value: "project", label: "Persönliches Projekt", color: "bg-cyan-100 text-cyan-800", category: "gap-year" },
+  { value: "other", label: "Sonstiges", color: "bg-gray-100 text-gray-800", category: "other" },
+]
 
 // German/EU skill rating system (1-5 scale)
 const SKILL_LEVELS = [
@@ -61,6 +79,7 @@ const LANGUAGE_LEVELS = [
 export function ApplicationEditor({ application, onUpdate }: ApplicationEditorProps) {
   const [activeSection, setActiveSection] = useState("personal")
   const [isSaving, setIsSaving] = useState(false)
+  const [expandedCompanies, setExpandedCompanies] = useState<Set<string>>(new Set())
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -68,7 +87,7 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     { id: "personal", label: "Persönliche Daten", icon: User },
     { id: "cover-letter", label: "Anschreiben", icon: Mail },
     { id: "summary", label: "Profil", icon: FileText },
-    { id: "experience", label: "Berufserfahrung", icon: Briefcase },
+    { id: "experience", label: "Berufserfahrung & Aktivitäten", icon: Briefcase },
     { id: "education", label: "Bildung", icon: GraduationCap },
     { id: "skills", label: "Fähigkeiten", icon: Code },
     { id: "languages", label: "Sprachen", icon: Languages },
@@ -165,9 +184,11 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
       startDate: "",
       endDate: "",
       current: false,
+      employmentType: "full-time",
       description: "",
       achievements: [],
       technologies: [],
+      skills: [],
       attachments: [],
     }
     updateResume("experience", [...(application.resume_data?.experience || []), newExp])
@@ -183,6 +204,22 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     const experiences = application.resume_data?.experience || []
     const filtered = experiences.filter((exp: any) => exp.id !== id)
     updateResume("experience", filtered)
+  }
+
+  const duplicateExperience = (experience: any) => {
+    const newExp = {
+      ...experience,
+      id: `exp-${Date.now()}`,
+      title: `${experience.title} (Kopie)`,
+      current: false,
+      endDate: "",
+    }
+    updateResume("experience", [...(application.resume_data?.experience || []), newExp])
+
+    toast({
+      title: "Position dupliziert",
+      description: "Die Position wurde erfolgreich kopiert. Sie können sie nun bearbeiten.",
+    })
   }
 
   const addSkillCategory = () => {
@@ -295,6 +332,16 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     const projects = application.projects_data || []
     const filtered = projects.filter((project: any) => project.id !== id)
     onUpdate({ projects_data: filtered })
+  }
+
+  const toggleCompanyExpansion = (company: string) => {
+    const newExpanded = new Set(expandedCompanies)
+    if (newExpanded.has(company)) {
+      newExpanded.delete(company)
+    } else {
+      newExpanded.add(company)
+    }
+    setExpandedCompanies(newExpanded)
   }
 
   const renderStars = (rating: number, onRatingChange?: (rating: number) => void) => {
@@ -589,137 +636,336 @@ export function ApplicationEditor({ application, onUpdate }: ApplicationEditorPr
     </div>
   )
 
-  const renderExperience = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Berufserfahrung</h3>
-        <Button onClick={addExperience} size="sm">
-          <Plus className="w-4 h-4 mr-1" />
-          Position hinzufügen
-        </Button>
-      </div>
+  const renderExperience = () => {
+    const experiences = application.resume_data?.experience || []
 
-      {application.resume_data?.experience?.map((exp: any) => (
-        <Card key={exp.id}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Berufserfahrung</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => removeExperience(exp.id)}>
-                <Trash2 className="w-4 h-4" />
+    // Group experiences by company
+    const groupedExperiences = experiences.reduce((acc: any, exp: any) => {
+      const company = exp.company || "Unbekanntes Unternehmen"
+      if (!acc[company]) {
+        acc[company] = []
+      }
+      acc[company].push(exp)
+      return acc
+    }, {})
+
+    // Sort experiences within each company by start date (newest first)
+    Object.keys(groupedExperiences).forEach((company) => {
+      groupedExperiences[company].sort((a: any, b: any) => {
+        const dateA = new Date(a.startDate || "1900-01")
+        const dateB = new Date(b.startDate || "1900-01")
+        return dateB.getTime() - dateA.getTime()
+      })
+    })
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium">Berufserfahrung & Aktivitäten</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Fügen Sie alle beruflichen Erfahrungen, Praktika, Gap Year Aktivitäten und Studentenjobs hinzu.
+            </p>
+          </div>
+          <Button onClick={addExperience} size="sm">
+            <Plus className="w-4 h-4 mr-1" />
+            Erfahrung hinzufügen
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
+          <div className="text-center p-3 bg-green-50 rounded-lg">
+            <div className="text-sm font-medium text-green-800">Vollzeit/Teilzeit</div>
+            <div className="text-xs text-green-600">Reguläre Anstellungen</div>
+          </div>
+          <div className="text-center p-3 bg-purple-50 rounded-lg">
+            <div className="text-sm font-medium text-purple-800">Praktika/Studentenjobs</div>
+            <div className="text-xs text-purple-600">Während des Studiums</div>
+          </div>
+          <div className="text-center p-3 bg-orange-50 rounded-lg">
+            <div className="text-sm font-medium text-orange-800">Gap Year Aktivitäten</div>
+            <div className="text-xs text-orange-600">Reisen, Freiwilligenarbeit, etc.</div>
+          </div>
+        </div>
+
+        {Object.keys(groupedExperiences).length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Briefcase className="w-12 h-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Noch keine Erfahrungen hinzugefügt</h3>
+              <p className="text-gray-600 text-center mb-4">
+                Fügen Sie Ihre beruflichen Erfahrungen, Praktika oder Gap Year Aktivitäten hinzu.
+              </p>
+              <Button onClick={addExperience}>
+                <Plus className="w-4 h-4 mr-2" />
+                Erste Erfahrung hinzufügen
               </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Jobtitel *</Label>
-                <Input
-                  value={exp.title}
-                  onChange={(e) => updateExperience(exp.id, "title", e.target.value)}
-                  placeholder="Senior Frontend Developer"
-                />
-              </div>
-              <div>
-                <Label>Unternehmen *</Label>
-                <Input
-                  value={exp.company}
-                  onChange={(e) => updateExperience(exp.id, "company", e.target.value)}
-                  placeholder="Digital Solutions AG"
-                />
-              </div>
-              <div>
-                <Label>Ort</Label>
-                <Input
-                  value={exp.location}
-                  onChange={(e) => updateExperience(exp.id, "location", e.target.value)}
-                  placeholder="Berlin, Deutschland"
-                />
-              </div>
-              <div>
-                <Label>Beginn *</Label>
-                <Input
-                  type="month"
-                  value={exp.startDate}
-                  onChange={(e) => updateExperience(exp.id, "startDate", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Ende</Label>
-                <Input
-                  type="month"
-                  value={exp.endDate}
-                  onChange={(e) => updateExperience(exp.id, "endDate", e.target.value)}
-                  disabled={exp.current}
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`current-${exp.id}`}
-                  checked={exp.current}
-                  onCheckedChange={(checked) => updateExperience(exp.id, "current", checked)}
-                />
-                <Label htmlFor={`current-${exp.id}`}>Aktuelle Position</Label>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        ) : (
+          Object.entries(groupedExperiences).map(([company, companyExperiences]: [string, any]) => (
+            <Card key={company} className="overflow-hidden">
+              <Collapsible open={expandedCompanies.has(company)} onOpenChange={() => toggleCompanyExpansion(company)}>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="w-5 h-5 text-gray-600" />
+                        <div>
+                          <CardTitle className="text-lg">{company}</CardTitle>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-gray-600">
+                              {companyExperiences.length} Position{companyExperiences.length !== 1 ? "en" : ""}
+                            </span>
+                            <div className="flex gap-1">
+                              {companyExperiences.map((exp: any) => {
+                                const employmentType = EMPLOYMENT_TYPES.find((t) => t.value === exp.employmentType)
+                                return (
+                                  <Badge
+                                    key={exp.id}
+                                    className={employmentType?.color || "bg-gray-100 text-gray-800"}
+                                    variant="secondary"
+                                  >
+                                    {employmentType?.label || exp.employmentType}
+                                  </Badge>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const latestExp = companyExperiences[0]
+                            duplicateExperience(latestExp)
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Position hinzufügen
+                        </Button>
+                        {expandedCompanies.has(company) ? (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="space-y-6 pt-0">
+                    {companyExperiences.map((exp: any, index: number) => (
+                      <div key={exp.id} className={`${index > 0 ? "border-t pt-6" : ""}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className={
+                                EMPLOYMENT_TYPES.find((t) => t.value === exp.employmentType)?.color ||
+                                "bg-gray-100 text-gray-800"
+                              }
+                            >
+                              {EMPLOYMENT_TYPES.find((t) => t.value === exp.employmentType)?.label ||
+                                exp.employmentType}
+                            </Badge>
+                            <span className="text-sm text-gray-600">Position #{index + 1}</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => duplicateExperience(exp)}>
+                              <Plus className="w-4 h-4 mr-1" />
+                              Duplizieren
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => removeExperience(exp.id)}>
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
 
-            <div>
-              <Label>Tätigkeitsbeschreibung *</Label>
-              <Textarea
-                value={exp.description}
-                onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
-                rows={4}
-                placeholder="Beschreiben Sie Ihre Hauptaufgaben und Verantwortlichkeiten..."
-              />
-            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <Label>Jobtitel / Aktivität *</Label>
+                            <Input
+                              value={exp.title}
+                              onChange={(e) => updateExperience(exp.id, "title", e.target.value)}
+                              placeholder="Senior Frontend Developer"
+                            />
+                          </div>
+                          <div>
+                            <Label>Unternehmen / Organisation *</Label>
+                            <Input
+                              value={exp.company}
+                              onChange={(e) => updateExperience(exp.id, "company", e.target.value)}
+                              placeholder="Digital Solutions AG"
+                            />
+                          </div>
+                          <div>
+                            <Label>Ort</Label>
+                            <Input
+                              value={exp.location}
+                              onChange={(e) => updateExperience(exp.id, "location", e.target.value)}
+                              placeholder="Berlin, Deutschland"
+                            />
+                          </div>
+                          <div>
+                            <Label>Art der Tätigkeit</Label>
+                            <Select
+                              value={exp.employmentType}
+                              onValueChange={(value) => updateExperience(exp.id, "employmentType", value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                  Anstellungen
+                                </div>
+                                {EMPLOYMENT_TYPES.filter((t) => t.category === "employment").map((type) => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full ${type.color.split(" ")[0]}`} />
+                                      {type.label}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                                <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
+                                  Gap Year Aktivitäten
+                                </div>
+                                {EMPLOYMENT_TYPES.filter((t) => t.category === "gap-year").map((type) => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full ${type.color.split(" ")[0]}`} />
+                                      {type.label}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                                <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
+                                  Sonstiges
+                                </div>
+                                {EMPLOYMENT_TYPES.filter((t) => t.category === "other").map((type) => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full ${type.color.split(" ")[0]}`} />
+                                      {type.label}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Beginn *</Label>
+                            <Input
+                              type="month"
+                              value={exp.startDate}
+                              onChange={(e) => updateExperience(exp.id, "startDate", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>Ende</Label>
+                            <Input
+                              type="month"
+                              value={exp.endDate}
+                              onChange={(e) => updateExperience(exp.id, "endDate", e.target.value)}
+                              disabled={exp.current}
+                            />
+                          </div>
+                          <div className="flex items-center space-x-2 md:col-span-2">
+                            <Checkbox
+                              id={`current-${exp.id}`}
+                              checked={exp.current}
+                              onCheckedChange={(checked) => updateExperience(exp.id, "current", checked)}
+                            />
+                            <Label htmlFor={`current-${exp.id}`}>Aktuelle Position / Laufende Aktivität</Label>
+                          </div>
+                        </div>
 
-            <div>
-              <Label>Erfolge und Leistungen</Label>
-              <Textarea
-                value={exp.achievements?.join("\n") || ""}
-                onChange={(e) =>
-                  updateExperience(
-                    exp.id,
-                    "achievements",
-                    e.target.value.split("\n").filter((a) => a.trim()),
-                  )
-                }
-                rows={4}
-                placeholder="• Performance-Verbesserung um 40%&#10;• Leitung eines 4-köpfigen Teams&#10;• Implementierung neuer Technologien"
-              />
-              <p className="text-sm text-gray-500 mt-1">Ein Erfolg pro Zeile</p>
-            </div>
+                        <div className="mb-4">
+                          <Label>Beschreibung der Tätigkeit *</Label>
+                          <Textarea
+                            value={exp.description}
+                            onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
+                            rows={4}
+                            placeholder="Beschreiben Sie Ihre Hauptaufgaben, Verantwortlichkeiten oder was Sie bei dieser Aktivität gemacht haben..."
+                          />
+                        </div>
 
-            <div>
-              <Label>Verwendete Technologien</Label>
-              <Input
-                value={exp.technologies?.join(", ") || ""}
-                onChange={(e) =>
-                  updateExperience(
-                    exp.id,
-                    "technologies",
-                    e.target.value
-                      .split(",")
-                      .map((t) => t.trim())
-                      .filter(Boolean),
-                  )
-                }
-                placeholder="React, TypeScript, Next.js, GraphQL"
-              />
-              <p className="text-sm text-gray-500 mt-1">Technologien durch Kommas getrennt</p>
-            </div>
+                        <div className="mb-4">
+                          <Label>Erfolge und Leistungen</Label>
+                          <Textarea
+                            value={exp.achievements?.join("\n") || ""}
+                            onChange={(e) =>
+                              updateExperience(
+                                exp.id,
+                                "achievements",
+                                e.target.value.split("\n").filter((a) => a.trim()),
+                              )
+                            }
+                            rows={4}
+                            placeholder="• Performance-Verbesserung um 40%&#10;• Leitung eines 4-köpfigen Teams&#10;• Implementierung neuer Technologien"
+                          />
+                          <p className="text-sm text-gray-500 mt-1">Ein Erfolg pro Zeile</p>
+                        </div>
 
-            <Separator />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <Label>Verwendete Technologien</Label>
+                            <Input
+                              value={exp.technologies?.join(", ") || ""}
+                              onChange={(e) =>
+                                updateExperience(
+                                  exp.id,
+                                  "technologies",
+                                  e.target.value
+                                    .split(",")
+                                    .map((t) => t.trim())
+                                    .filter(Boolean),
+                                )
+                              }
+                              placeholder="React, TypeScript, Next.js, GraphQL"
+                            />
+                            <p className="text-sm text-gray-500 mt-1">Technologien durch Kommas getrennt</p>
+                          </div>
+                          <div>
+                            <Label>Erworbene Fähigkeiten</Label>
+                            <Input
+                              value={exp.skills?.join(", ") || ""}
+                              onChange={(e) =>
+                                updateExperience(
+                                  exp.id,
+                                  "skills",
+                                  e.target.value
+                                    .split(",")
+                                    .map((s) => s.trim())
+                                    .filter(Boolean),
+                                )
+                              }
+                              placeholder="Projektmanagement, Teamführung, Interkulturelle Kompetenz"
+                            />
+                            <p className="text-sm text-gray-500 mt-1">Fähigkeiten durch Kommas getrennt</p>
+                          </div>
+                        </div>
 
-            <div className="space-y-4">
-              <Label>Dokumente und Nachweise</Label>
-              {renderFileUpload("experience", exp.id)}
-              {renderAttachedFiles("experience", exp.id)}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
+                        <Separator className="my-4" />
+
+                        <div className="space-y-4">
+                          <Label>Dokumente und Nachweise</Label>
+                          {renderFileUpload("experience", exp.id)}
+                          {renderAttachedFiles("experience", exp.id)}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+          ))
+        )}
+      </div>
+    )
+  }
 
   const renderEducation = () => (
     <div className="space-y-6">
