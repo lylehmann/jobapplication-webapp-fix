@@ -1,5 +1,11 @@
 "use client"
-import { Star, MapPin, Phone, Mail, Globe, Github, Linkedin } from "lucide-react"
+import Star from "lucide-react/dist/esm/icons/star"
+import MapPin from "lucide-react/dist/esm/icons/map-pin"
+import Phone from "lucide-react/dist/esm/icons/phone"
+import Mail from "lucide-react/dist/esm/icons/mail"
+import Globe from "lucide-react/dist/esm/icons/globe"
+import Github from "lucide-react/dist/esm/icons/github"
+import Linkedin from "lucide-react/dist/esm/icons/linkedin"
 import type { Database } from "@/lib/database.types"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
@@ -27,16 +33,16 @@ export function PrintableResume({ application }: PrintableResumeProps) {
   return (
     <div
       id="printable-resume"
-      className="max-w-none mx-auto bg-white text-black"
+      className="bg-white mx-auto max-w-none text-black"
       style={{ fontFamily: "Times New Roman, serif", fontSize: "11pt", lineHeight: "1.4" }}
     >
       {/* Clean Header */}
-      <div className="text-center border-b-2 border-gray-300 pb-6 mb-8">
-        <h1 className="text-3xl font-bold mb-3 text-gray-900">{personalInfo.fullName || "Ihr Name"}</h1>
-        <div className="text-lg text-gray-700 mb-4 font-medium">{application.job_title || "Gewünschte Position"}</div>
+      <div className="mb-8 pb-6 border-gray-300 border-b-2 text-center">
+        <h1 className="mb-3 font-bold text-gray-900 text-3xl">{personalInfo.fullName || "Ihr Name"}</h1>
+        <div className="mb-4 font-medium text-gray-700 text-lg">{application.job_title || "Gewünschte Position"}</div>
 
         {/* Contact Info - Clean Layout */}
-        <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600">
+        <div className="flex flex-wrap justify-center gap-6 text-gray-600 text-sm">
           {personalInfo.email && (
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
@@ -57,7 +63,7 @@ export function PrintableResume({ application }: PrintableResumeProps) {
           )}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 mt-2">
+        <div className="flex flex-wrap justify-center gap-6 mt-2 text-gray-600 text-sm">
           {personalInfo.portfolio && (
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
@@ -82,25 +88,25 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       {/* Professional Summary */}
       {resume.summary && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-300">BERUFLICHES PROFIL</h2>
-          <p className="text-sm leading-relaxed text-justify text-gray-700">{resume.summary}</p>
+          <h2 className="mb-4 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">BERUFLICHES PROFIL</h2>
+          <p className="text-gray-700 text-sm text-justify leading-relaxed">{resume.summary}</p>
         </div>
       )}
 
       {/* Experience - German Format */}
       {resume.experience && resume.experience.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 pb-2 border-b border-gray-300">BERUFSERFAHRUNG</h2>
+          <h2 className="mb-6 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">BERUFSERFAHRUNG</h2>
           <div className="space-y-6">
             {resume.experience.map((exp: any, index: number) => (
               <div key={exp.id || index} className="flex gap-8">
                 {/* Date Column - Left Side - Fixed Width */}
-                <div className="w-32 flex-shrink-0 text-right pr-4">
-                  <div className="text-sm font-medium text-gray-900">
+                <div className="flex-shrink-0 pr-4 w-32 text-right">
+                  <div className="font-medium text-gray-900 text-sm">
                     {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
                   </div>
                   {exp.location && (
-                    <div className="text-xs text-gray-500 mt-1 flex items-center justify-end gap-1">
+                    <div className="flex justify-end items-center gap-1 mt-1 text-gray-500 text-xs">
                       <MapPin className="w-3 h-3" />
                       {exp.location}
                     </div>
@@ -108,19 +114,19 @@ export function PrintableResume({ application }: PrintableResumeProps) {
                 </div>
 
                 {/* Content Column - Right Side */}
-                <div className="flex-1 border-l border-gray-200 pl-4">
-                  <h3 className="font-bold text-base text-gray-900">{exp.title}</h3>
-                  <div className="text-sm text-gray-700 font-medium mb-3">{exp.company}</div>
+                <div className="flex-1 pl-4 border-gray-200 border-l">
+                  <h3 className="font-bold text-gray-900 text-base">{exp.title}</h3>
+                  <div className="mb-3 font-medium text-gray-700 text-sm">{exp.company}</div>
 
-                  <p className="text-sm mb-4 text-justify leading-relaxed text-gray-700">{exp.description}</p>
+                  <p className="mb-4 text-gray-700 text-sm text-justify leading-relaxed">{exp.description}</p>
 
                   {exp.achievements && exp.achievements.length > 0 && (
                     <div className="mb-4">
-                      <h4 className="font-medium text-sm mb-2 text-gray-800">Erfolge und Leistungen:</h4>
+                      <h4 className="mb-2 font-medium text-gray-800 text-sm">Erfolge und Leistungen:</h4>
                       <ul className="space-y-1">
                         {exp.achievements.map((achievement: string, achIndex: number) => (
-                          <li key={achIndex} className="flex items-start gap-2 text-sm text-gray-700">
-                            <span className="text-blue-600 mt-1">•</span>
+                          <li key={achIndex} className="flex items-start gap-2 text-gray-700 text-sm">
+                            <span className="mt-1 text-blue-600">•</span>
                             <span>{achievement}</span>
                           </li>
                         ))}
@@ -144,25 +150,25 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       {/* Education */}
       {resume.education && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 pb-2 border-b border-gray-300">BILDUNG</h2>
+          <h2 className="mb-6 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">BILDUNG</h2>
 
           {/* Degree */}
           {resume.education.degree && (
             <div className="flex gap-8 mb-6">
-              <div className="w-32 flex-shrink-0 text-right pr-4">
-                <div className="text-sm font-medium text-gray-900">{resume.education.degree.graduationYear}</div>
+              <div className="flex-shrink-0 pr-4 w-32 text-right">
+                <div className="font-medium text-gray-900 text-sm">{resume.education.degree.graduationYear}</div>
               </div>
-              <div className="flex-1 border-l border-gray-200 pl-4">
-                <h3 className="font-bold text-base text-gray-900">{resume.education.degree.title}</h3>
-                <div className="text-sm text-gray-700 font-medium">{resume.education.degree.institution}</div>
+              <div className="flex-1 pl-4 border-gray-200 border-l">
+                <h3 className="font-bold text-gray-900 text-base">{resume.education.degree.title}</h3>
+                <div className="font-medium text-gray-700 text-sm">{resume.education.degree.institution}</div>
                 {resume.education.degree.location && (
-                  <div className="text-sm text-gray-600">{resume.education.degree.location}</div>
+                  <div className="text-gray-600 text-sm">{resume.education.degree.location}</div>
                 )}
                 {resume.education.degree.gpa && (
-                  <div className="text-sm text-gray-700 mt-1">Abschlussnote: {resume.education.degree.gpa}</div>
+                  <div className="mt-1 text-gray-700 text-sm">Abschlussnote: {resume.education.degree.gpa}</div>
                 )}
                 {resume.education.degree.thesis && (
-                  <div className="text-sm text-gray-700 mt-2 italic">
+                  <div className="mt-2 text-gray-700 text-sm italic">
                     <strong>Abschlussarbeit:</strong> {resume.education.degree.thesis}
                   </div>
                 )}
@@ -173,17 +179,17 @@ export function PrintableResume({ application }: PrintableResumeProps) {
           {/* Certifications */}
           {resume.education.certifications && resume.education.certifications.length > 0 && (
             <div>
-              <h3 className="font-medium text-sm mb-4 text-gray-800">Zertifikate</h3>
+              <h3 className="mb-4 font-medium text-gray-800 text-sm">Zertifikate</h3>
               <div className="space-y-3">
                 {resume.education.certifications.map((cert: any) => (
                   <div key={cert.id} className="flex gap-8">
-                    <div className="w-32 flex-shrink-0 text-right pr-4">
-                      <div className="text-sm text-gray-900">{cert.date && formatDate(cert.date)}</div>
+                    <div className="flex-shrink-0 pr-4 w-32 text-right">
+                      <div className="text-gray-900 text-sm">{cert.date && formatDate(cert.date)}</div>
                     </div>
-                    <div className="flex-1 border-l border-gray-200 pl-4">
-                      <div className="font-medium text-sm text-gray-900">{cert.name}</div>
-                      <div className="text-sm text-gray-700">{cert.issuer}</div>
-                      {cert.credentialId && <div className="text-xs text-gray-500">ID: {cert.credentialId}</div>}
+                    <div className="flex-1 pl-4 border-gray-200 border-l">
+                      <div className="font-medium text-gray-900 text-sm">{cert.name}</div>
+                      <div className="text-gray-700 text-sm">{cert.issuer}</div>
+                      {cert.credentialId && <div className="text-gray-500 text-xs">ID: {cert.credentialId}</div>}
                     </div>
                   </div>
                 ))}
@@ -197,7 +203,7 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       {resume.skills &&
         Object.values(resume.skills).some((skills: any) => Array.isArray(skills) && skills.length > 0) && (
           <div className="mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 pb-2 border-b border-gray-300">
+            <h2 className="mb-6 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">
               TECHNISCHE FÄHIGKEITEN
             </h2>
             <div className="space-y-6">
@@ -213,16 +219,16 @@ export function PrintableResume({ application }: PrintableResumeProps) {
 
                 return (
                   <div key={category}>
-                    <h3 className="font-bold text-sm mb-3 text-gray-900">{categoryTitles[category] || category}</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <h3 className="mb-3 font-bold text-gray-900 text-sm">{categoryTitles[category] || category}</h3>
+                    <div className="gap-4 grid grid-cols-2">
                       {skills.map((skill: any, index: number) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-2 border border-gray-200 rounded"
+                          className="flex justify-between items-center p-2 border border-gray-200 rounded"
                         >
                           <div>
                             <span className="font-medium text-sm">{skill.name}</span>
-                            <span className="text-xs text-gray-500 ml-2">({skill.yearsOfExperience} Jahre)</span>
+                            <span className="ml-2 text-gray-500 text-xs">({skill.yearsOfExperience} Jahre)</span>
                           </div>
                           <div className="flex items-center gap-1">{renderStars(skill.rating)}</div>
                         </div>
@@ -238,16 +244,16 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       {/* Languages */}
       {resume.languages && resume.languages.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 pb-2 border-b border-gray-300">SPRACHKENNTNISSE</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <h2 className="mb-6 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">SPRACHKENNTNISSE</h2>
+          <div className="gap-4 grid grid-cols-3">
             {resume.languages.map((language: any) => (
-              <div key={language.id} className="text-center p-3 border border-gray-200 rounded">
-                <div className="flex items-center justify-center gap-2 mb-2">
+              <div key={language.id} className="p-3 border border-gray-200 rounded text-center">
+                <div className="flex justify-center items-center gap-2 mb-2">
                   {language.flag && <span className="text-lg">{language.flag}</span>}
                   <span className="font-medium text-sm">{language.name}</span>
                 </div>
-                <div className="text-xs text-gray-600 px-2 py-1 bg-gray-100 rounded">{language.level}</div>
-                {language.description && <div className="text-xs text-gray-600 mt-1">{language.description}</div>}
+                <div className="bg-gray-100 px-2 py-1 rounded text-gray-600 text-xs">{language.level}</div>
+                {language.description && <div className="mt-1 text-gray-600 text-xs">{language.description}</div>}
               </div>
             ))}
           </div>
@@ -257,27 +263,27 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       {/* Projects Summary */}
       {application.projects_data && application.projects_data.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 pb-2 border-b border-gray-300">PROJEKTÜBERSICHT</h2>
-          <div className="text-sm text-center mb-4 p-3 bg-gray-50 rounded border">
+          <h2 className="mb-6 pb-2 border-gray-300 border-b font-bold text-gray-900 text-lg">PROJEKTÜBERSICHT</h2>
+          <div className="bg-gray-50 mb-4 p-3 border rounded text-sm text-center">
             <strong>{application.projects_data.length} Frontend-Projekte</strong> - Detaillierte Projektübersicht als
             separate Anlage
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="gap-4 grid grid-cols-2">
             {application.projects_data.slice(0, 4).map((project: any) => (
               <div key={project.id} className="p-3 border border-gray-200 rounded">
-                <h4 className="font-medium text-sm text-gray-900">{project.name}</h4>
-                <div className="text-xs text-gray-600 mt-1">
+                <h4 className="font-medium text-gray-900 text-sm">{project.name}</h4>
+                <div className="mt-1 text-gray-600 text-xs">
                   {formatDate(project.startDate)} - {formatDate(project.endDate) || "heute"}
                 </div>
                 {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {project.technologies.slice(0, 3).map((tech: string, index: number) => (
-                      <span key={index} className="px-1 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+                      <span key={index} className="bg-gray-100 px-1 py-0.5 rounded text-gray-700 text-xs">
                         {tech}
                       </span>
                     ))}
                     {project.technologies.length > 3 && (
-                      <span className="text-xs text-gray-500">+{project.technologies.length - 3}</span>
+                      <span className="text-gray-500 text-xs">+{project.technologies.length - 3}</span>
                     )}
                   </div>
                 )}
@@ -288,7 +294,7 @@ export function PrintableResume({ application }: PrintableResumeProps) {
       )}
 
       {/* Footer */}
-      <div className="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-gray-300">
+      <div className="mt-8 pt-4 border-gray-300 border-t text-gray-500 text-xs text-center">
         Lebenslauf - {personalInfo.fullName} - {new Date().toLocaleDateString("de-DE")}
       </div>
     </div>

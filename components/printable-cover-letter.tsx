@@ -1,6 +1,11 @@
 "use client"
 
-import { Mail, Phone, MapPin, Globe, Calendar, Building } from "lucide-react"
+import Mail from "lucide-react/dist/esm/icons/mail"
+import Phone from "lucide-react/dist/esm/icons/phone"
+import MapPin from "lucide-react/dist/esm/icons/map-pin"
+import Globe from "lucide-react/dist/esm/icons/globe"
+import Calendar from "lucide-react/dist/esm/icons/calendar"
+import Building from "lucide-react/dist/esm/icons/building"
 import type { Database } from "@/lib/database.types"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
@@ -21,15 +26,15 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
   return (
     <div
       id="printable-cover-letter"
-      className="max-w-none mx-auto bg-white text-black"
+      className="bg-white mx-auto max-w-none text-black"
       style={{ fontFamily: "Times New Roman, serif", fontSize: "11pt", lineHeight: "1.5" }}
     >
       {/* Clean Header */}
-      <div className="flex justify-between items-start mb-8 pb-6 border-b border-gray-300">
+      <div className="flex justify-between items-start mb-8 pb-6 border-gray-300 border-b">
         {/* Sender Info */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">{personalInfo.fullName || "Ihr Name"}</h1>
-          <div className="space-y-1 text-sm text-gray-700">
+          <h1 className="mb-3 font-bold text-gray-900 text-2xl">{personalInfo.fullName || "Ihr Name"}</h1>
+          <div className="space-y-1 text-gray-700 text-sm">
             {personalInfo.location && (
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
@@ -59,7 +64,7 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
 
         {/* Date */}
         <div className="text-right">
-          <div className="flex items-center gap-2 text-sm text-gray-600 border border-gray-300 px-3 py-2 rounded">
+          <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded text-gray-600 text-sm">
             <Calendar className="w-4 h-4" />
             <span>{coverLetter.date ? formatDate(coverLetter.date) : formatDate("")}</span>
           </div>
@@ -70,7 +75,7 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
       <div className="mb-8 p-4 border border-gray-300 rounded">
         <div className="flex items-center gap-2 mb-3">
           <Building className="w-4 h-4 text-gray-600" />
-          <span className="font-medium text-sm text-gray-700">Empfänger</span>
+          <span className="font-medium text-gray-700 text-sm">Empfänger</span>
         </div>
         {coverLetter.recipientName && (
           <div className="font-bold text-gray-900">
@@ -79,12 +84,12 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
           </div>
         )}
         <div className="font-bold text-gray-900">{coverLetter.company || application.company || "Firmenname"}</div>
-        {coverLetter.address && <div className="whitespace-pre-line text-gray-700 mt-1">{coverLetter.address}</div>}
+        {coverLetter.address && <div className="mt-1 text-gray-700 whitespace-pre-line">{coverLetter.address}</div>}
       </div>
 
       {/* Subject */}
       {coverLetter.subject && (
-        <div className="mb-6 p-3 border-l-4 border-blue-500 bg-blue-50">
+        <div className="bg-blue-50 mb-6 p-3 border-blue-500 border-l-4">
           <div className="font-bold text-gray-900">
             <strong>Betreff: {coverLetter.subject}</strong>
           </div>
@@ -97,13 +102,13 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
         <div className="font-medium text-gray-900">{coverLetter.salutation || "Sehr geehrte Damen und Herren,"}</div>
 
         {/* Opening Paragraph */}
-        {coverLetter.openingParagraph && <p className="text-justify text-gray-700">{coverLetter.openingParagraph}</p>}
+        {coverLetter.openingParagraph && <p className="text-gray-700 text-justify">{coverLetter.openingParagraph}</p>}
 
         {/* Body Paragraphs */}
         {coverLetter.bodyParagraphs && (
           <div className="space-y-4">
             {coverLetter.bodyParagraphs.split("\n\n").map((paragraph: string, index: number) => (
-              <p key={index} className="text-justify text-gray-700">
+              <p key={index} className="text-gray-700 text-justify">
                 {paragraph}
               </p>
             ))}
@@ -111,34 +116,34 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
         )}
 
         {/* Closing Paragraph */}
-        {coverLetter.closingParagraph && <p className="text-justify text-gray-700">{coverLetter.closingParagraph}</p>}
+        {coverLetter.closingParagraph && <p className="text-gray-700 text-justify">{coverLetter.closingParagraph}</p>}
 
         {/* Sign Off */}
         <div className="mt-8">
           <div className="mb-4 text-gray-700">{coverLetter.signOff || "Mit freundlichen Grüßen"}</div>
-          <div className="mt-8 font-bold text-lg text-gray-900">{personalInfo.fullName || "Ihr Name"}</div>
+          <div className="mt-8 font-bold text-gray-900 text-lg">{personalInfo.fullName || "Ihr Name"}</div>
         </div>
       </div>
 
       {/* Attachments Note */}
       <div className="mt-8 p-4 border border-gray-300 rounded">
-        <div className="font-bold text-sm mb-2">Anlagen:</div>
-        <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="mb-2 font-bold text-sm">Anlagen:</div>
+        <div className="gap-2 grid grid-cols-2 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+            <div className="bg-gray-600 rounded-full w-2 h-2"></div>
             <span>Lebenslauf</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+            <div className="bg-gray-600 rounded-full w-2 h-2"></div>
             <span>Zeugnisse</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+            <div className="bg-gray-600 rounded-full w-2 h-2"></div>
             <span>Zertifikate</span>
           </div>
           {application.projects_data && application.projects_data.length > 0 && (
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+              <div className="bg-gray-600 rounded-full w-2 h-2"></div>
               <span>Projektportfolio</span>
             </div>
           )}
@@ -146,7 +151,7 @@ export function PrintableCoverLetter({ application }: PrintableCoverLetterProps)
       </div>
 
       {/* Footer */}
-      <div className="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-gray-300">
+      <div className="mt-8 pt-4 border-gray-300 border-t text-gray-500 text-xs text-center">
         Anschreiben - {personalInfo.fullName} - {new Date().toLocaleDateString("de-DE")}
       </div>
     </div>

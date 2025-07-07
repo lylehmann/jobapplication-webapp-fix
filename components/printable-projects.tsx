@@ -1,17 +1,15 @@
 "use client"
-import {
-  Calendar,
-  Phone,
-  Mail,
-  Globe,
-  Github,
-  ExternalLink,
-  Users,
-  Target,
-  TrendingUp,
-  Code2,
-  Star,
-} from "lucide-react"
+import Calendar from "lucide-react/dist/esm/icons/calendar"
+import Phone from "lucide-react/dist/esm/icons/phone"
+import Mail from "lucide-react/dist/esm/icons/mail"
+import Globe from "lucide-react/dist/esm/icons/globe"
+import Github from "lucide-react/dist/esm/icons/github"
+import ExternalLink from "lucide-react/dist/esm/icons/external-link"
+import Users from "lucide-react/dist/esm/icons/users"
+import Target from "lucide-react/dist/esm/icons/target"
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up"
+import Code2 from "lucide-react/dist/esm/icons/code-2"
+import Star from "lucide-react/dist/esm/icons/star"
 import type { Database } from "@/lib/database.types"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
@@ -44,15 +42,15 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
   return (
     <div
       id="printable-projects"
-      className="max-w-none mx-auto bg-white text-black"
+      className="bg-white mx-auto max-w-none text-black"
       style={{ fontFamily: "Times New Roman, serif", fontSize: "11pt", lineHeight: "1.3" }}
     >
       {/* Header */}
-      <div className="text-center mb-8 pb-4 border-b border-gray-400">
-        <h1 className="text-2xl font-bold mb-2">PROJEKTPORTFOLIO</h1>
-        <h2 className="text-lg font-medium mb-3">{personalInfo.fullName || "Ihr Name"}</h2>
-        <div className="text-sm space-y-1">
-          <div className="flex justify-center items-center gap-4 flex-wrap">
+      <div className="mb-8 pb-4 border-gray-400 border-b text-center">
+        <h1 className="mb-2 font-bold text-2xl">PROJEKTPORTFOLIO</h1>
+        <h2 className="mb-3 font-medium text-lg">{personalInfo.fullName || "Ihr Name"}</h2>
+        <div className="space-y-1 text-sm">
+          <div className="flex flex-wrap justify-center items-center gap-4">
             {personalInfo.email && (
               <span className="flex items-center gap-1">
                 <Mail className="w-3 h-3" />
@@ -82,41 +80,41 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
       </div>
 
       {/* Portfolio Summary */}
-      <div className="mb-8 bg-blue-50 p-4 rounded border-l-4 border-blue-500">
-        <h2 className="text-base font-bold mb-3 flex items-center gap-2">
+      <div className="bg-blue-50 mb-8 p-4 border-blue-500 border-l-4 rounded">
+        <h2 className="flex items-center gap-2 mb-3 font-bold text-base">
           <Target className="w-4 h-4" />
           PORTFOLIO-ÜBERSICHT
         </h2>
-        <div className="grid grid-cols-4 gap-4 text-center">
-          <div className="bg-white p-3 rounded border">
-            <div className="text-2xl font-bold text-blue-600">{totalProjects}</div>
-            <div className="text-xs text-gray-600">Projekte gesamt</div>
+        <div className="gap-4 grid grid-cols-4 text-center">
+          <div className="bg-white p-3 border rounded">
+            <div className="font-bold text-blue-600 text-2xl">{totalProjects}</div>
+            <div className="text-gray-600 text-xs">Projekte gesamt</div>
           </div>
-          <div className="bg-white p-3 rounded border">
-            <div className="text-2xl font-bold text-green-600">{completedProjects}</div>
-            <div className="text-xs text-gray-600">Abgeschlossen</div>
+          <div className="bg-white p-3 border rounded">
+            <div className="font-bold text-green-600 text-2xl">{completedProjects}</div>
+            <div className="text-gray-600 text-xs">Abgeschlossen</div>
           </div>
-          <div className="bg-white p-3 rounded border">
-            <div className="text-2xl font-bold text-purple-600">{allTechnologies.length}</div>
-            <div className="text-xs text-gray-600">Technologien</div>
+          <div className="bg-white p-3 border rounded">
+            <div className="font-bold text-purple-600 text-2xl">{allTechnologies.length}</div>
+            <div className="text-gray-600 text-xs">Technologien</div>
           </div>
-          <div className="bg-white p-3 rounded border">
-            <div className="text-2xl font-bold text-orange-600">{Math.round(avgProjectDuration || 0)}</div>
-            <div className="text-xs text-gray-600">Ø Monate/Projekt</div>
+          <div className="bg-white p-3 border rounded">
+            <div className="font-bold text-orange-600 text-2xl">{Math.round(avgProjectDuration || 0)}</div>
+            <div className="text-gray-600 text-xs">Ø Monate/Projekt</div>
           </div>
         </div>
       </div>
 
       {/* Technology Stack Overview */}
       <div className="mb-8">
-        <h2 className="text-base font-bold mb-3 pb-1 border-b border-gray-300 flex items-center gap-2">
+        <h2 className="flex items-center gap-2 mb-3 pb-1 border-gray-300 border-b font-bold text-base">
           <Code2 className="w-4 h-4" />
           TECHNOLOGIE-STACK
         </h2>
-        <div className="bg-gray-50 p-4 rounded border">
+        <div className="bg-gray-50 p-4 border rounded">
           <div className="flex flex-wrap gap-2">
             {allTechnologies.map((tech: string) => (
-              <span key={tech} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded border">
+              <span key={tech} className="bg-blue-100 px-2 py-1 border rounded text-blue-800 text-xs">
                 {tech}
               </span>
             ))}
@@ -126,16 +124,16 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
 
       {/* Detailed Projects */}
       <div className="space-y-8">
-        <h2 className="text-base font-bold mb-4 pb-1 border-b border-gray-300">DETAILLIERTE PROJEKTBESCHREIBUNGEN</h2>
+        <h2 className="mb-4 pb-1 border-gray-300 border-b font-bold text-base">DETAILLIERTE PROJEKTBESCHREIBUNGEN</h2>
 
         {projects.map((project: any, index: number) => (
-          <div key={project.id} className="border-l-4 border-purple-400 pl-4 bg-purple-50 p-4 rounded-r">
+          <div key={project.id} className="bg-purple-50 p-4 pl-4 border-purple-400 border-l-4 rounded-r">
             {/* Project Header */}
             <div className="mb-4">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="text-lg font-bold text-purple-800">{project.name}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                  <h3 className="font-bold text-purple-800 text-lg">{project.name}</h3>
+                  <div className="flex items-center gap-4 mt-1 text-gray-600 text-sm">
                     {project.role && (
                       <span className="flex items-center gap-1">
                         <Users className="w-3 h-3" />
@@ -191,21 +189,21 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
             </div>
 
             {/* Project Description */}
-            <div className="mb-4 bg-white p-3 rounded border">
-              <h4 className="font-medium text-sm mb-2">Projektbeschreibung</h4>
+            <div className="bg-white mb-4 p-3 border rounded">
+              <h4 className="mb-2 font-medium text-sm">Projektbeschreibung</h4>
               <p className="text-sm text-justify leading-relaxed">{project.description}</p>
             </div>
 
             {/* Technologies Used */}
             {project.technologies && project.technologies.length > 0 && (
-              <div className="mb-4 bg-white p-3 rounded border">
-                <h4 className="font-medium text-sm mb-2 flex items-center gap-1">
+              <div className="bg-white mb-4 p-3 border rounded">
+                <h4 className="flex items-center gap-1 mb-2 font-medium text-sm">
                   <Code2 className="w-3 h-3" />
                   Verwendete Technologien
                 </h4>
                 <div className="flex flex-wrap gap-1">
                   {project.technologies.map((tech: string, techIndex: number) => (
-                    <span key={techIndex} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded border">
+                    <span key={techIndex} className="bg-blue-100 px-2 py-1 border rounded text-blue-800 text-xs">
                       {tech}
                     </span>
                   ))}
@@ -215,8 +213,8 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
 
             {/* Project Achievements */}
             {project.achievements && project.achievements.length > 0 && (
-              <div className="mb-4 bg-white p-3 rounded border">
-                <h4 className="font-medium text-sm mb-2 flex items-center gap-1">
+              <div className="bg-white mb-4 p-3 border rounded">
+                <h4 className="flex items-center gap-1 mb-2 font-medium text-sm">
                   <TrendingUp className="w-3 h-3" />
                   Erfolge und Ergebnisse
                 </h4>
@@ -233,12 +231,12 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
 
             {/* Project Impact */}
             {project.impact && (
-              <div className="bg-white p-3 rounded border">
-                <h4 className="font-medium text-sm mb-2 flex items-center gap-1">
+              <div className="bg-white p-3 border rounded">
+                <h4 className="flex items-center gap-1 mb-2 font-medium text-sm">
                   <Star className="w-3 h-3" />
                   Projektwirkung
                 </h4>
-                <p className="text-sm text-gray-700">{project.impact}</p>
+                <p className="text-gray-700 text-sm">{project.impact}</p>
               </div>
             )}
           </div>
@@ -246,7 +244,7 @@ export function PrintableProjects({ application }: PrintableProjectsProps) {
       </div>
 
       {/* Footer */}
-      <div className="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-gray-300">
+      <div className="mt-8 pt-4 border-gray-300 border-t text-gray-500 text-xs text-center">
         Projektportfolio - {personalInfo.fullName} - {new Date().toLocaleDateString("de-DE")} - Seite 1
       </div>
     </div>

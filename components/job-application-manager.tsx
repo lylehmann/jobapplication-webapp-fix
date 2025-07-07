@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Search, MoreVertical, Eye, Edit, Trash2, FileText, Calendar, Building2 } from "lucide-react"
+import { Plus, Search, MoreVertical, Eye, Edit, Trash2, FileText, Calendar, Building2, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -35,7 +35,7 @@ type Application = Database["public"]["Tables"]["applications"]["Row"]
 
 export function JobApplicationManager() {
   const { toast } = useToast()
-  const { applications, createApplication, updateApplication, deleteApplication } = useApplications()
+  const { applications, createApplication, updateApplication, deleteApplication, refresh, ConflictDialog, markDirty } = useApplications()
   const [currentView, setCurrentView] = useState<"dashboard" | "editor" | "preview" | "templates">("dashboard")
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
@@ -169,22 +169,37 @@ export function JobApplicationManager() {
 
   if (currentView === "editor" && selectedApplication) {
     return (
-      <ApplicationEditor
-        application={selectedApplication}
-        onUpdate={handleUpdateApplication}
-        onBack={() => setCurrentView("dashboard")}
-        onPreview={() => setCurrentView("preview")}
-      />
+      <>
+        <div className="flex justify-end p-2">
+          <Button variant="outline" onClick={refresh} className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Sync mit Supabase
+          </Button>
+        </div>
+        <ApplicationEditor
+          application={selectedApplication}
+          onUpdate={(updates) => {
+            markDirty()
+            handleUpdateApplication(selectedApplication.id, updates)
+          }}
+          onBack={() => setCurrentView("dashboard")}
+          onPreview={() => setCurrentView("preview")}
+        />
+        <ConflictDialog />
+      </>
     )
   }
 
   if (currentView === "preview" && selectedApplication) {
     return (
-      <ApplicationPreview
-        application={selectedApplication}
-        onBack={() => setCurrentView("dashboard")}
-        onEdit={() => setCurrentView("editor")}
-      />
+      <>
+        <ApplicationPreview
+          application={selectedApplication}
+          onBack={() => setCurrentView("dashboard")}
+          onEdit={() => setCurrentView("editor")}
+        />
+        <ConflictDialog />
+      </>
     )
   }
 
@@ -193,23 +208,23 @@ export function JobApplicationManager() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto p-6 max-w-7xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Job Applications</h1>
-            <p className="text-muted-foreground mt-1">Manage your job applications and track your progress</p>
+            <h1 className="font-bold text-foreground text-3xl">Job Applications</h1>
+            <p className="mt-1 text-muted-foreground">Manage your job applications and track your progress</p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => setCurrentView("templates")}>
-              <FileText className="w-4 h-4 mr-2" />
+              <FileText className="mr-2 w-4 h-4" />
               Templates
             </Button>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="mr-2 w-4 h-4" />
                   New Application
                 </Button>
               </DialogTrigger>
@@ -280,7 +295,7 @@ export function JobApplicationManager() {
         {/* Filters */}
         <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Search className="top-1/2 left-3 absolute w-4 h-4 text-muted-foreground -translate-y-1/2 transform" />
             <Input
               placeholder="Search applications..."
               value={searchQuery}
@@ -316,15 +331,15 @@ export function JobApplicationManager() {
         </div>
 
         {/* Applications Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredApplications.map((application) => {
             const roleData = ROLE_DEFINITIONS[application.target_role]
             return (
               <Card key={application.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-1">{application.job_title}</CardTitle>
+                      <CardTitle className="mb-1 text-lg">{application.job_title}</CardTitle>
                       <CardDescription className="flex items-center gap-2 mb-3">
                         <Building2 className="w-4 h-4" />
                         {application.company}
@@ -347,11 +362,11 @@ export function JobApplicationManager() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEditApplication(application)}>
-                          <Edit className="w-4 h-4 mr-2" />
+                          <Edit className="mr-2 w-4 h-4" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handlePreviewApplication(application)}>
-                          <Eye className="w-4 h-4 mr-2" />
+                          <Eye className="mr-2 w-4 h-4" />
                           Preview
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -363,7 +378,7 @@ export function JobApplicationManager() {
                           }}
                           className="text-destructive"
                         >
-                          <Trash2 className="w-4 h-4 mr-2" />
+                          <Trash2 className="mr-2 w-4 h-4" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -371,7 +386,7 @@ export function JobApplicationManager() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                  <div className="flex justify-between items-center mb-4 text-muted-foreground text-sm">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       {new Date(application.updated_at).toLocaleDateString()}
@@ -384,7 +399,7 @@ export function JobApplicationManager() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button size="sm" onClick={() => handleEditApplication(application)} className="flex-1">
-                      <Edit className="w-4 h-4 mr-2" />
+                      <Edit className="mr-2 w-4 h-4" />
                       Edit
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => handlePreviewApplication(application)}>
@@ -398,23 +413,24 @@ export function JobApplicationManager() {
         </div>
 
         {filteredApplications.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="py-12 text-center">
+            <div className="flex justify-center items-center bg-muted mx-auto mb-4 rounded-lg w-12 h-12">
               <FileText className="w-6 h-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">No applications found</h3>
-            <p className="text-muted-foreground mb-4">
+            <h3 className="mb-2 font-medium text-foreground text-lg">No applications found</h3>
+            <p className="mb-4 text-muted-foreground">
               {searchQuery || statusFilter !== "all" || roleFilter !== "all"
                 ? "Try adjusting your search or filters"
                 : "Create your first job application to get started"}
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 w-4 h-4" />
               Create Application
             </Button>
           </div>
         )}
       </div>
+      <ConflictDialog />
     </div>
   )
 }

@@ -1,4 +1,6 @@
 // Central file storage service
+import { createClient } from "@/lib/supabase/client"
+
 export interface FileItem {
   id: string
   name: string
@@ -10,10 +12,57 @@ export interface FileItem {
   uploadDate: string
   tags: string[]
   description?: string
+  supabaseUrl?: string // URL aus Supabase Storage
+  localUrl?: string   // Lokale URL
 }
 
 class FileStorageService {
   private storageKey = "file-manager-files"
+  private supabase = createClient()
+
+  // Check if we're in demo mode
+  private isDemoMode(): boolean {
+    return typeof window !== "undefined" && 
+           localStorage.getItem("demo-user-session") === "true"
+  }
+
+  // Upload to Supabase Storage
+  private async uploadToSupabase(file: File): Promise<string> {
+    const fileName = `${Date.now()}-${file.name}`
+    const { data, error } = await this.supabase.storage
+      .from('application-files')
+      .upload(fileName, file)
+
+    if (error) {
+      console.error('Supabase upload error:', error)
+      throw new Error(`Supabase upload failed: ${error.message}`)
+    }
+
+    // Get public URL
+    const { data: urlData } = this.supabase.storage
+      .from('application-files')
+      .getPublicUrl(fileName)
+
+    return urlData.publicUrl
+  }
+
+  // Upload to local storage (API route)
+  private async uploadLocally(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+    
+    if (!response.ok) {
+      throw new Error('Local upload failed')
+    }
+    
+    const data = await response.json()
+    return data.url
+  }
 
   // Convert file to base64 for storage
   private fileToBase64(file: File): Promise<string> {
@@ -51,19 +100,57 @@ class FileStorageService {
     }
   }
 
-  // Upload new file
+  // Upload new file (hybrid: both local and Supabase)
   async uploadFile(file: File, category?: string): Promise<FileItem> {
     try {
-      const base64 = await this.fileToBase64(file)
       const fileType = file.type.startsWith("image/") ? "image" : file.type.includes("pdf") ? "document" : "other"
+      let localUrl: string | undefined
+      let supabaseUrl: string | undefined
+      let base64: string | undefined
+
+      // Always try local upload for demo mode and fallback
+      try {
+        localUrl = await this.uploadLocally(file)
+        console.log('✓ Local upload successful:', localUrl)
+      } catch (error) {
+        console.warn('Local upload failed:', error)
+      }
+
+      // Try Supabase upload if not in demo mode
+      if (!this.isDemoMode()) {
+        try {
+          supabaseUrl = await this.uploadToSupabase(file)
+          console.log('✓ Supabase upload successful:', supabaseUrl)
+        } catch (error) {
+          console.warn('Supabase upload failed:', error)
+        }
+      }
+
+      // For images, also store base64 for immediate display
+      if (fileType === "image") {
+        try {
+          base64 = await this.fileToBase64(file)
+        } catch (error) {
+          console.warn('Base64 conversion failed:', error)
+        }
+      }
+
+      // Determine the primary URL to use
+      const primaryUrl = supabaseUrl || localUrl || base64
+
+      if (!primaryUrl) {
+        throw new Error('All upload methods failed')
+      }
 
       const newFile: FileItem = {
         id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
         name: file.name,
         type: fileType,
         size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
-        base64,
-        url: fileType === "image" ? base64 : undefined,
+        url: primaryUrl,
+        base64: fileType === "image" ? base64 : undefined,
+        localUrl,
+        supabaseUrl,
         category: category || (fileType === "image" ? "Uploaded Images" : "Uploaded Documents"),
         uploadDate: new Date().toISOString().split("T")[0],
         tags: [],
@@ -74,10 +161,11 @@ class FileStorageService {
       const updatedFiles = [...files, newFile]
       this.saveFiles(updatedFiles)
 
+      console.log('✓ File uploaded successfully:', newFile)
       return newFile
     } catch (error) {
       console.error("Error uploading file:", error)
-      throw new Error("Failed to upload file")
+      throw new Error(`Failed to upload file: ${error}`)
     }
   }
 

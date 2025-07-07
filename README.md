@@ -29,7 +29,7 @@ A comprehensive web application for managing job applications, resumes, and cove
 
 1. **Clone the repository**
    \`\`\`bash
-   git clone <repository-url>
+   git clone `your-repository-url`
    cd job-application-manager
    \`\`\`
 

@@ -9,9 +9,16 @@ export function useAuth() {
   const supabase = createClient()
 
   useEffect(() => {
-    // Check for demo user session
-    const demoSession = localStorage.getItem("demo-user-session")
-    if (demoSession) {
+    // Auto-activate demo session in development
+    const isDev = process.env.NODE_ENV === "development" || 
+                  (typeof window !== "undefined" && window.location.hostname === "localhost")
+    
+    if (isDev) {
+      const demoSession = localStorage.getItem("demo-user-session")
+      if (!demoSession) {
+        localStorage.setItem("demo-user-session", "true")
+        console.log("Auto-activated demo session")
+      }
       setUser({
         id: "demo-user-123",
         email: "demo@example.com",
@@ -21,7 +28,7 @@ export function useAuth() {
       return
     }
 
-    // Check for real auth session
+    // Check for real auth session in production only
     const checkAuth = async () => {
       const {
         data: { user: authUser },

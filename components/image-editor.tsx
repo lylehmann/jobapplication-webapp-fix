@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import Cropper from 'react-easy-crop'
+import { getCroppedImg } from '@/lib/crop-utils'
 
 interface ImageEditorProps {
   isOpen: boolean
@@ -16,30 +18,35 @@ interface ImageEditorProps {
 }
 
 export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEditorProps) {
-  const [zoom, setZoom] = useState([100])
+  const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [brightness, setBrightness] = useState([100])
   const [contrast, setContrast] = useState([100])
   const [saturation, setSaturation] = useState([100])
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const handleRotate = () => {
-    setRotation((prev) => (prev + 90) % 360)
+  const handleCropComplete = (_croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels)
   }
 
-  const handleSave = () => {
-    // In a real implementation, you would apply all the transformations
-    // to the canvas and export the result
-    const canvas = canvasRef.current
-    if (canvas) {
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.9)
-      onSave(dataUrl)
-    }
+  const handleSave = async () => {
+    if (!initialImage || !croppedAreaPixels) return onClose()
+    const croppedImg = await getCroppedImg(
+      initialImage,
+      croppedAreaPixels,
+      rotation,
+      brightness[0],
+      contrast[0],
+      saturation[0]
+    )
+    onSave(croppedImg)
     onClose()
   }
 
   const handleReset = () => {
-    setZoom([100])
+    setZoom(1)
     setRotation(0)
     setBrightness([100])
     setContrast([100])
@@ -55,26 +62,26 @@ export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEdit
         </DialogHeader>
 
         <div className="flex gap-6 h-[600px]">
-          {/* Image Preview */}
-          <div className="flex-1 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-            <div className="relative">
-              <canvas
-                ref={canvasRef}
-                className="max-w-full max-h-full border rounded"
+          {/* Image Preview mit Cropper */}
+          <div className="flex flex-1 justify-center items-center bg-gray-100 rounded-lg overflow-hidden">
+            <div className="relative w-full min-w-[400px] h-full min-h-[400px]">
+              <Cropper
+                image={initialImage}
+                crop={crop}
+                zoom={zoom}
+                rotation={rotation}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onRotationChange={setRotation}
+                onCropComplete={handleCropComplete}
+                cropShape="round"
+                showGrid={false}
                 style={{
-                  transform: `rotate(${rotation}deg) scale(${zoom[0] / 100})`,
-                  filter: `brightness(${brightness[0]}%) contrast(${contrast[0]}%) saturate(${saturation[0]}%)`,
-                  transition: "all 0.2s ease",
-                }}
-              />
-              <img
-                src={initialImage || "/placeholder.svg?height=400&width=400"}
-                alt="Profile preview"
-                className="max-w-full max-h-full rounded"
-                style={{
-                  transform: `rotate(${rotation}deg) scale(${zoom[0] / 100})`,
-                  filter: `brightness(${brightness[0]}%) contrast(${contrast[0]}%) saturate(${saturation[0]}%)`,
-                  transition: "all 0.2s ease",
+                  containerStyle: { width: '100%', height: '100%' },
+                  mediaStyle: {
+                    filter: `brightness(${brightness[0]}%) contrast(${contrast[0]}%) saturate(${saturation[0]}%)`,
+                  },
                 }}
               />
             </div>
@@ -90,19 +97,14 @@ export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEdit
               <div className="space-y-4">
                 <h4 className="font-medium">Transform</h4>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={handleRotate}>
-                    <RotateCw className="w-4 h-4 mr-2" />
+                  <Button size="sm" variant="outline" onClick={() => setRotation((prev) => (prev + 90) % 360)}>
+                    <RotateCw className="mr-2 w-4 h-4" />
                     Rotate
                   </Button>
-                  <Button size="sm" variant="outline">
-                    <Crop className="w-4 h-4 mr-2" />
-                    Crop
-                  </Button>
                 </div>
-
                 <div className="space-y-2">
-                  <Label>Zoom: {zoom[0]}%</Label>
-                  <Slider value={zoom} onValueChange={setZoom} min={50} max={200} step={10} className="w-full" />
+                  <Label>Zoom: {Math.round(zoom * 100)}%</Label>
+                  <Slider value={[zoom * 100]} onValueChange={v => setZoom(v[0] / 100)} min={50} max={200} step={1} className="w-full" />
                 </div>
               </div>
 
@@ -112,14 +114,7 @@ export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEdit
 
                 <div className="space-y-2">
                   <Label>Brightness: {brightness[0]}%</Label>
-                  <Slider
-                    value={brightness}
-                    onValueChange={setBrightness}
-                    min={50}
-                    max={150}
-                    step={5}
-                    className="w-full"
-                  />
+                  <Slider value={brightness} onValueChange={setBrightness} min={50} max={150} step={5} className="w-full" />
                 </div>
 
                 <div className="space-y-2">
@@ -129,14 +124,7 @@ export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEdit
 
                 <div className="space-y-2">
                   <Label>Saturation: {saturation[0]}%</Label>
-                  <Slider
-                    value={saturation}
-                    onValueChange={setSaturation}
-                    min={0}
-                    max={200}
-                    step={10}
-                    className="w-full"
-                  />
+                  <Slider value={saturation} onValueChange={setSaturation} min={0} max={200} step={10} className="w-full" />
                 </div>
               </div>
 
@@ -145,7 +133,7 @@ export function ImageEditor({ isOpen, onClose, onSave, initialImage }: ImageEdit
                 <Button onClick={handleSave} className="w-full">
                   Save Changes
                 </Button>
-                <Button onClick={handleReset} variant="outline" className="w-full bg-transparent">
+                <Button onClick={handleReset} variant="outline" className="bg-transparent w-full">
                   Reset All
                 </Button>
                 <Button onClick={onClose} variant="ghost" className="w-full">

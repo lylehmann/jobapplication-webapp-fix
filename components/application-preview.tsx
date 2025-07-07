@@ -4,24 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Globe,
-  Github,
-  Linkedin,
-  Calendar,
-  Building2,
-  Star,
-  ExternalLink,
-  FileText,
-  Award,
-  Briefcase,
-  Paperclip,
-} from "lucide-react"
+import User from "lucide-react/dist/esm/icons/user"
+import Mail from "lucide-react/dist/esm/icons/mail"
+import Phone from "lucide-react/dist/esm/icons/phone"
+import MapPin from "lucide-react/dist/esm/icons/map-pin"
+import Globe from "lucide-react/dist/esm/icons/globe"
+import Github from "lucide-react/dist/esm/icons/github"
+import Linkedin from "lucide-react/dist/esm/icons/linkedin"
+import Calendar from "lucide-react/dist/esm/icons/calendar"
+import Building2 from "lucide-react/dist/esm/icons/building-2"
+import Star from "lucide-react/dist/esm/icons/star"
+import ExternalLink from "lucide-react/dist/esm/icons/external-link"
+import FileText from "lucide-react/dist/esm/icons/file-text"
+import Award from "lucide-react/dist/esm/icons/award"
+import Briefcase from "lucide-react/dist/esm/icons/briefcase"
+import Paperclip from "lucide-react/dist/esm/icons/paperclip"
 import type { Database } from "@/lib/database.types"
+import { useState } from "react"
+import { Switch } from "@/components/ui/switch"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
 
@@ -30,9 +30,20 @@ interface ApplicationPreviewProps {
 }
 
 export function ApplicationPreview({ application }: ApplicationPreviewProps) {
+  const [selectedDoc, setSelectedDoc] = useState<'cover-letter' | 'resume' | 'projects'>('cover-letter')
+  const [atsMode, setAtsMode] = useState(false)
+  const docTypes = [
+    { id: 'cover-letter', label: 'Anschreiben' },
+    { id: 'resume', label: 'Lebenslauf' },
+    { id: 'projects', label: 'Projektübersicht' },
+  ]
+  const docIndex = docTypes.findIndex(d => d.id === selectedDoc)
+  const goToPrevious = () => setSelectedDoc(docTypes[(docIndex + docTypes.length - 1) % docTypes.length].id as any)
+  const goToNext = () => setSelectedDoc(docTypes[(docIndex + 1) % docTypes.length].id as any)
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
+      <Star key={`star-${i}`} className={`w-4 h-4 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
     ))
   }
 
@@ -76,46 +87,46 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
     return (
       <Card className="print:shadow-none print:border-0">
         <CardHeader className="print:pb-4">
-          <CardTitle className="flex items-center gap-2 text-center print:text-2xl">
-            <User className="w-5 h-5 print:hidden" />
+          <CardTitle className="flex items-center gap-2 print:text-2xl text-center">
+            <User className="print:hidden w-5 h-5" />
             {application.personal_info?.fullName || "Name nicht angegeben"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
+          <div className="gap-4 print:gap-2 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2">
             {application.personal_info?.email && (
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-muted-foreground print:hidden" />
+                <Mail className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.email}</span>
               </div>
             )}
             {application.personal_info?.phone && (
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-muted-foreground print:hidden" />
+                <Phone className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.phone}</span>
               </div>
             )}
             {application.personal_info?.location && (
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground print:hidden" />
+                <MapPin className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.location}</span>
               </div>
             )}
             {application.personal_info?.portfolio && (
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-muted-foreground print:hidden" />
+                <Globe className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.portfolio}</span>
               </div>
             )}
             {application.personal_info?.github && (
               <div className="flex items-center gap-2">
-                <Github className="w-4 h-4 text-muted-foreground print:hidden" />
+                <Github className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.github}</span>
               </div>
             )}
             {application.personal_info?.linkedin && (
               <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-muted-foreground print:hidden" />
+                <Linkedin className="print:hidden w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{application.personal_info.linkedin}</span>
               </div>
             )}
@@ -123,11 +134,11 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
 
           <Separator className="print:border-gray-400" />
 
-          <div className="flex items-center justify-between print:justify-center print:text-center">
+          <div className="flex justify-between print:justify-center items-center print:text-center">
             <div>
               <div className="font-medium text-lg print:text-xl">{application.job_title}</div>
-              <div className="text-sm text-muted-foreground flex items-center gap-1 print:justify-center">
-                <Building2 className="w-4 h-4 print:hidden" />
+              <div className="flex print:justify-center items-center gap-1 text-muted-foreground text-sm">
+                <Building2 className="print:hidden w-4 h-4" />
                 {application.company}
               </div>
             </div>
@@ -142,78 +153,164 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
     )
   }
 
-  const renderCoverLetter = () => (
-    <Card className="print:shadow-none print:border-0 print:break-before-page">
-      <CardHeader className="print:pb-4">
-        <CardTitle className="print:text-xl">Anschreiben</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 print:space-y-6">
-        <div className="text-right text-sm text-muted-foreground print:text-black">
-          {application.cover_letter_data?.date &&
-            new Date(application.cover_letter_data.date).toLocaleDateString("de-DE")}
+  // Modern, compact contact header
+  const renderContactHeader = () => {
+    let address = "";
+    const info = application.personal_info;
+    if (info?.address && typeof info.address === 'object') {
+      // If address is an object: { street, postalCode, city }
+      const parts = [];
+      if (info.address.street) parts.push(info.address.street);
+      if (info.address.postalCode && info.address.city) {
+        parts.push(`${info.address.postalCode} ${info.address.city}`);
+      } else if (info.address.city) {
+        parts.push(info.address.city);
+      } else if (info.address.postalCode) {
+        parts.push(info.address.postalCode);
+      }
+      address = parts.join(', ');
+    } else if (typeof info?.address === 'string') {
+      address = info.address;
+    } else if (info?.location) {
+      address = info.location;
+    }
+    return (
+      <div className="flex print:flex-row flex-col print:justify-between gap-1 print:gap-0 mb-4 print:mb-6 text-sm print:text-base">
+        <div className="flex flex-1 items-center gap-4">
+          {/* Avatar falls vorhanden */}
+          {selectedDoc === 'resume' && info?.profilePicture && (
+            <img
+              src={info.profilePicture}
+              alt="Profilbild"
+              className="border border-gray-300 print:border-none rounded-full w-16 h-16 object-cover"
+              style={{ minWidth: 64, minHeight: 64 }}
+            />
+          )}
+          <div>
+            <div className="font-bold print:text-base text-lg">{info?.fullName}</div>
+            <div className="text-gray-700 print:text-black">{address}</div>
+          </div>
         </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 print:mt-0 text-gray-500 print:text-black text-xs print:text-base">
+          {info?.phone && (
+            <span className="flex items-center gap-1">
+              <Phone className="print:hidden w-4 h-4" />{info.phone}
+            </span>
+          )}
+          {info?.email && (
+            <span className="flex items-center gap-1">
+              <Mail className="print:hidden w-4 h-4" />{info.email}
+            </span>
+          )}
+          {info?.portfolio && (
+            <span className="flex items-center gap-1">
+              <Globe className="print:hidden w-4 h-4" />{info.portfolio}
+            </span>
+          )}
+          {info?.github && (
+            <span className="flex items-center gap-1">
+              <Github className="print:hidden w-4 h-4" />{info.github}
+            </span>
+          )}
+          {info?.linkedin && (
+            <span className="flex items-center gap-1">
+              <Linkedin className="print:hidden w-4 h-4" />{info.linkedin}
+            </span>
+          )}
+        </div>
+      </div>
+    )
+  }
 
+  const renderCoverLetter = () => (
+    <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+      <div className="print:pb-4" />
+      <div className="space-y-4 print:space-y-6">
+        {renderContactHeader()}
+        <Separator className="my-2 print:my-2" />
         {application.cover_letter_data?.address && (
           <div className="text-sm print:text-base">
             <div className="font-medium">{application.cover_letter_data.company || application.company}</div>
             <div className="whitespace-pre-line">{application.cover_letter_data.address}</div>
           </div>
         )}
-
-        {application.cover_letter_data?.subject && (
-          <div className="font-medium print:text-base print:font-bold">
-            Betreff: {application.cover_letter_data.subject}
+        {application.cover_letter_data?.date && (
+          <div className="text-muted-foreground print:text-black text-sm text-right">
+            {(() => {
+              let ort = '';
+              const info = application.personal_info;
+              if (info?.address && typeof info.address === 'object' && info.address.city) {
+                ort = info.address.city;
+              } else if (typeof info?.address === 'string') {
+                // Try to extract city from string (last word)
+                const parts = info.address.split(',');
+                ort = parts[parts.length - 1].trim();
+              } else if (info?.location) {
+                ort = info.location;
+              }
+              const date = new Date(application.cover_letter_data.date);
+              const dateStr = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+              return ort ? `${ort}, den ${dateStr}` : `den ${dateStr}`;
+            })()}
           </div>
         )}
-
+        {application.cover_letter_data?.subject && (
+          <div className="font-medium print:font-bold print:text-base">
+            {application.cover_letter_data.subject}
+          </div>
+        )}
         {application.cover_letter_data?.salutation && (
           <div className="print:text-base">{application.cover_letter_data.salutation}</div>
         )}
-
         {application.cover_letter_data?.openingParagraph && (
-          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
+          <p className="text-sm print:text-base leading-relaxed print:leading-relaxed">
             {application.cover_letter_data.openingParagraph}
           </p>
         )}
-
         {application.cover_letter_data?.bodyParagraphs && (
-          <div className="text-sm leading-relaxed whitespace-pre-line print:text-base print:leading-relaxed">
+          <div className="text-sm print:text-base leading-relaxed print:leading-relaxed whitespace-pre-line">
             {application.cover_letter_data.bodyParagraphs}
           </div>
         )}
-
         {application.cover_letter_data?.closingParagraph && (
-          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
+          <p className="text-sm print:text-base leading-relaxed print:leading-relaxed">
             {application.cover_letter_data.closingParagraph}
           </p>
         )}
-
         {application.cover_letter_data?.signOff && (
-          <div className="text-sm print:text-base print:mt-8">
+          <div className="print:mt-8 text-sm print:text-base">
             {application.cover_letter_data.signOff}
             <br />
             {application.personal_info?.fullName}
           </div>
         )}
-      </CardContent>
-    </Card>
+        {(() => {
+          // Check which documents are present
+          const hasResume = (application.resume_data?.experience && application.resume_data.experience.length > 0) ||
+            (application.resume_data?.education && application.resume_data.education.length > 0);
+          const hasProjects = application.projects_data && application.projects_data.length > 0;
+          const attachments = (application.selected_documents || []).filter(doc =>
+            doc.section === 'experience' || doc.section === 'education' || doc.section === 'other' || doc.section === 'certificate'
+          );
+          if (!hasResume && !hasProjects && attachments.length === 0) return null;
+          return (
+            <div className="mt-8 text-sm print:text-base">
+              <div className="mb-1 font-medium">Anlagen:</div>
+              <ul className="ml-6 list-disc">
+                {hasResume && <li>Lebenslauf</li>}
+                {hasProjects && <li>Projektübersicht</li>}
+                {attachments.map((doc: any) => (
+                  <li key={doc.id}>{doc.name || 'Anlage'}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        })()}
+      </div>
+    </div>
   )
 
-  const renderSummary = () =>
-    application.resume_data?.summary && (
-      <Card className="print:shadow-none print:border-0 print:break-before-page">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Berufliches Profil</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm leading-relaxed print:text-base print:leading-relaxed">
-            {application.resume_data.summary}
-          </p>
-        </CardContent>
-      </Card>
-    )
-
-  const renderExperience = () => {
+  const renderExperience = (atsMode: boolean) => {
     const experiences = application.resume_data?.experience || []
     if (experiences.length === 0) return null
 
@@ -236,253 +333,273 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
       })
     })
 
+    if (atsMode) {
+      // ATS-optimiertes Layout: linear, keine Icons, keine Badges
+      return (
+        <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+          <div className="print:pb-4">
+            <div className="print:text-xl">Berufserfahrung</div>
+          </div>
+          <div className="space-y-6 print:space-y-4">
+            {Object.entries(groupedExperiences).map(([company, companyExperiences]: [string, any]) => (
+              <div key={company} className="space-y-4">
+                {companyExperiences.map((exp: any) => (
+                  <div key={exp.id} className="mb-4">
+                    <div className="font-semibold print:font-bold print:text-base">
+                      {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
+                    </div>
+                    <div className="font-medium print:font-bold print:text-base">{exp.title}</div>
+                    <div className="text-sm print:text-base">{company}{exp.location ? `, ${exp.location}` : ""}</div>
+                    {exp.description && (
+                      <p className="mb-2 text-sm print:text-base leading-relaxed print:leading-relaxed">
+                        {exp.description}
+                      </p>
+                    )}
+                    {exp.achievements && exp.achievements.length > 0 && (
+                      <ul className="space-y-1 print:space-y-1 ml-5 text-sm print:text-base list-disc">
+                        {exp.achievements.map((achievement: string) => (
+                          <li key={achievement}>{achievement}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {exp.technologies && exp.technologies.length > 0 && (
+                      <div className="mt-1 text-sm print:text-base">
+                        <span className="font-medium">Technologien:</span> {exp.technologies.join(", ")}
+                      </div>
+                    )}
+                    {exp.skills && exp.skills.length > 0 && (
+                      <div className="mt-1 text-sm print:text-base">
+                        <span className="font-medium">Erworbene Fähigkeiten:</span> {exp.skills.join(", ")}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    // Standard-Layout: Zeitraum links, Inhalte rechts
     return (
-      <Card className="print:shadow-none print:border-0">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="flex items-center gap-2 print:text-xl">
-            <Briefcase className="w-5 h-5 print:hidden" />
-            Berufserfahrung & Aktivitäten
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8 print:space-y-6">
+      <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+        <div className="print:pb-4">
+          <div className="print:text-xl">Berufserfahrung</div>
+        </div>
+        <div className="space-y-8 print:space-y-6">
           {Object.entries(groupedExperiences).map(([company, companyExperiences]: [string, any]) => (
             <div key={company} className="space-y-4">
               {/* Company Header */}
-              <div className="flex items-center gap-3 pb-2 border-b border-gray-200 print:border-gray-400">
-                <Building2 className="w-5 h-5 text-gray-600 print:hidden" />
+              <div className="flex items-center gap-3 pb-2 border-gray-200 print:border-gray-400 border-b">
+                <Building2 className="print:hidden w-5 h-5 text-gray-600" />
                 <div className="flex-1">
-                  <h4 className="font-semibold text-lg print:text-base print:font-bold">{company}</h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm text-gray-600 print:text-black print:text-base">
-                      {companyExperiences.length} Position{companyExperiences.length !== 1 ? "en" : ""}
-                    </span>
-                    <div className="flex gap-1 flex-wrap">
-                      {companyExperiences.map((exp: any) => {
-                        const employmentType = getEmploymentTypeBadge(exp.employmentType)
-                        return (
-                          <Badge key={exp.id} className={employmentType.color} variant="secondary">
-                            {employmentType.label}
-                          </Badge>
-                        )
-                      })}
-                    </div>
-                  </div>
+                  <h4 className="font-semibold print:font-bold print:text-base text-lg">{company}</h4>
                 </div>
               </div>
-
               {/* Company Positions */}
               <div className="space-y-6 print:space-y-4">
-                {companyExperiences.map((exp: any, index: number) => {
+                {companyExperiences.map((exp: any) => {
                   const employmentType = getEmploymentTypeBadge(exp.employmentType)
                   const positionFiles = (application.selected_documents || []).filter(
                     (doc: any) => doc.section === "experience" && doc.itemId === exp.id,
                   )
-
                   return (
-                    <div
-                      key={exp.id}
-                      className="border-l-2 border-blue-200 pl-4 print:border-l-4 print:border-gray-400"
-                    >
-                      <div className="flex items-start justify-between mb-2 print:block">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h5 className="font-medium print:text-base print:font-bold">{exp.title}</h5>
-                            <Badge className={employmentType.color}>{employmentType.label}</Badge>
-                            {companyExperiences.length > 1 && (
-                              <Badge variant="outline" className="text-xs print:bg-gray-100 print:text-black">
-                                Position #{index + 1}
-                              </Badge>
-                            )}
-                          </div>
-                          {exp.location && (
-                            <div className="text-sm text-muted-foreground print:text-black print:text-base">
-                              {exp.location}
-                            </div>
-                          )}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
-                          <Calendar className="w-4 h-4 print:hidden" />
-                          {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
+                    <div key={exp.id} className="gap-4 grid grid-cols-6 pl-4 print:border-gray-400 border-blue-200 border-l-2 print:border-l-4">
+                      {/* Zeitraum links */}
+                      <div className="flex flex-col items-start col-span-2">
+                        <Calendar className="print:hidden inline-block mr-1 w-4 h-4" />
+                        {formatDate(exp.startDate)} - {exp.current ? "heute" : formatDate(exp.endDate)}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <Badge className={employmentType.color}>{employmentType.label}</Badge>
+                          {exp.technologies?.map((tech: string) => (
+                            <Badge
+                              key={tech}
+                              variant="secondary"
+                              className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
+                            >
+                              {tech}
+                            </Badge>
+                          ))}
+                          {exp.skills?.map((skill: string) => (
+                            <Badge
+                              key={skill}
+                              variant="outline"
+                              className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
+                            >
+                              {skill}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
-
-                      {exp.description && (
-                        <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">
-                          {exp.description}
-                        </p>
-                      )}
-
-                      {exp.achievements && exp.achievements.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
-                          <ul className="text-sm space-y-1 print:text-base print:space-y-1">
-                            {exp.achievements.map((achievement: string, achievementIndex: number) => (
-                              <li key={achievementIndex} className="flex items-start gap-2">
-                                <span className="text-blue-500 mt-1 print:text-black">•</span>
-                                <span>{achievement}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {exp.technologies && exp.technologies.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Technologien:</div>
-                          <div className="flex flex-wrap gap-1 print:gap-2">
-                            {exp.technologies.map((tech: string, techIndex: number) => (
-                              <Badge
-                                key={techIndex}
-                                variant="secondary"
-                                className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
-                              >
-                                {tech}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {exp.skills && exp.skills.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-sm font-medium mb-1 print:text-base print:font-bold">
-                            Erworbene Fähigkeiten:
-                          </div>
-                          <div className="flex flex-wrap gap-1 print:gap-2">
-                            {exp.skills.map((skill: string, skillIndex: number) => (
-                              <Badge
-                                key={skillIndex}
-                                variant="outline"
-                                className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
-                              >
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Position-specific attachments */}
-                      {positionFiles.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-sm font-medium mb-2 flex items-center gap-1 print:text-base print:font-bold">
-                            <Paperclip className="w-4 h-4 print:hidden" />
-                            Angehängte Dokumente ({positionFiles.length}):
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 print:grid-cols-1 print:gap-1">
-                            {positionFiles.map((file: any) => (
-                              <div
-                                key={file.id}
-                                className="flex items-center gap-2 p-2 bg-gray-50 rounded text-xs print:bg-transparent print:border print:border-gray-300"
-                              >
-                                <FileText className="w-3 h-3 text-gray-500 print:hidden" />
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-medium truncate print:text-sm">{file.name}</div>
-                                  {file.description && (
-                                    <div className="text-gray-600 truncate print:text-black print:text-xs">
-                                      {file.description}
-                                    </div>
-                                  )}
-                                </div>
-                                <Badge variant="outline" className="text-xs print:hidden">
-                                  {(file.size / 1024).toFixed(1)} KB
-                                </Badge>
+                      {/* Inhalte rechts */}
+                      <div className="col-span-4">
+                        <div className="print:block flex justify-between items-start mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h5 className="font-medium print:font-bold print:text-base">{exp.title}</h5>
+                            </div>
+                            {exp.location && (
+                              <div className="text-muted-foreground print:text-black text-sm print:text-base">
+                                {exp.location}
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
-                      )}
+                        {exp.description && (
+                          <p className="mb-3 text-sm print:text-base leading-relaxed print:leading-relaxed">
+                            {exp.description}
+                          </p>
+                        )}
+                        {exp.achievements && exp.achievements.length > 0 && (
+                          <div className="mb-3">
+                            <div className="mb-1 font-medium print:font-bold text-sm print:text-base">Erfolge:</div>
+                            <ul className="space-y-1 print:space-y-1 text-sm print:text-base">
+                              {exp.achievements.map((achievement: string) => (
+                                <li key={achievement} className="flex items-start gap-2">
+                                  <span className="mt-1 text-blue-500 print:text-black">•</span>
+                                  <span>{achievement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {exp.technologies && exp.technologies.length > 0 && (
+                          <div className="mb-3">
+                            <div className="mb-1 font-medium print:font-bold text-sm print:text-base">Technologien:</div>
+                            <div className="flex flex-wrap gap-1 print:gap-2">
+                              {exp.technologies.map((tech: string) => (
+                                <Badge
+                                  key={tech}
+                                  variant="secondary"
+                                  className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
+                                >
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {exp.skills && exp.skills.length > 0 && (
+                          <div className="mb-3">
+                            <div className="mb-1 font-medium print:font-bold text-sm print:text-base">
+                              Erworbene Fähigkeiten:
+                            </div>
+                            <div className="flex flex-wrap gap-1 print:gap-2">
+                              {exp.skills.map((skill: string) => (
+                                <Badge
+                                  key={skill}
+                                  variant="outline"
+                                  className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
+                                >
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {/* Position-specific attachments */}
+                        {positionFiles.length > 0 && (
+                          <div className="mb-3">
+                            <div className="flex items-center gap-1 mb-2 font-medium print:font-bold text-sm print:text-base">
+                              <Paperclip className="print:hidden w-4 h-4" />
+                              Angehängte Dokumente ({positionFiles.length}):
+                            </div>
+                            <div className="gap-2 print:gap-1 grid grid-cols-1 md:grid-cols-2 print:grid-cols-1">
+                              {positionFiles.map((file: any) => (
+                                <div
+                                  key={file.id}
+                                  className="flex items-center gap-2 bg-gray-50 print:bg-transparent p-2 print:border print:border-gray-300 rounded text-xs"
+                                >
+                                  <FileText className="print:hidden w-3 h-3 text-gray-500" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium print:text-sm truncate">{file.name}</div>
+                                    {file.description && (
+                                      <div className="text-gray-600 print:text-black print:text-xs truncate">
+                                        {file.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <Badge variant="outline" className="print:hidden text-xs">
+                                    {(file.size / 1024).toFixed(1)} KB
+                                  </Badge>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )
                 })}
               </div>
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
   }
 
-  const renderEducation = () =>
+  const renderEducation = (atsMode: boolean) =>
     application.resume_data?.education?.degree && (
-      <Card className="print:shadow-none print:border-0">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Bildung</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-medium print:text-base print:font-bold">
+      <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+        <div className="print:pb-4">
+          <div className="print:text-xl">Bildung</div>
+        </div>
+        <div className="space-y-3">
+          <div className="gap-4 grid grid-cols-6">
+            {/* Zeitraum links */}
+            <div className="flex flex-col items-start col-span-2">
+              <Calendar className="print:hidden inline-block mr-1 w-4 h-4" />
+              {formatDate(application.resume_data.education.degree.startDate)} - {formatDate(application.resume_data.education.degree.graduationYear)}
+            </div>
+            {/* Inhalte rechts */}
+            <div className="col-span-4">
+              <h4 className="font-medium print:font-bold print:text-base">
                 {application.resume_data.education.degree.title}
               </h4>
-              <div className="text-sm text-muted-foreground print:text-black print:text-base">
+              <div className="text-muted-foreground print:text-black text-sm print:text-base">
                 {application.resume_data.education.degree.institution}
-                {application.resume_data.education.degree.location &&
-                  ` • ${application.resume_data.education.degree.location}`}
-                {application.resume_data.education.degree.graduationYear &&
-                  ` • ${application.resume_data.education.degree.graduationYear}`}
+                {application.resume_data.education.degree.location && ` • ${application.resume_data.education.degree.location}`}
+                {application.resume_data.education.degree.graduationYear && ` • ${application.resume_data.education.degree.graduationYear}`}
               </div>
               {application.resume_data.education.degree.gpa && (
-                <div className="text-sm text-muted-foreground print:text-black print:text-base">
+                <div className="text-muted-foreground print:text-black text-sm print:text-base">
                   Note: {application.resume_data.education.degree.gpa}
                 </div>
               )}
               {application.resume_data.education.degree.thesis && (
-                <div className="text-sm mt-2 print:text-base">
+                <div className="mt-2 text-sm print:text-base">
                   <span className="font-medium print:font-bold">Abschlussarbeit:</span>{" "}
                   {application.resume_data.education.degree.thesis}
                 </div>
               )}
             </div>
-
-            {application.resume_data.education.certifications &&
-              application.resume_data.education.certifications.length > 0 && (
-                <div>
-                  <Separator className="my-3 print:border-gray-400" />
-                  <h5 className="font-medium mb-2 flex items-center gap-2 print:text-base print:font-bold">
-                    <Award className="w-4 h-4 print:hidden" />
-                    Zertifikate
-                  </h5>
-                  <div className="space-y-2">
-                    {application.resume_data.education.certifications.map((cert: any) => (
-                      <div key={cert.id} className="text-sm print:text-base">
-                        <div className="font-medium print:font-bold">{cert.name}</div>
-                        <div className="text-muted-foreground print:text-black">
-                          {cert.issuer} • {new Date(cert.date).toLocaleDateString("de-DE")}
-                          {cert.expirationDate &&
-                            ` • Gültig bis ${new Date(cert.expirationDate).toLocaleDateString("de-DE")}`}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
 
   const renderSkills = () =>
     application.resume_data?.skills &&
     Object.keys(application.resume_data.skills).length > 0 && (
-      <Card className="print:shadow-none print:border-0">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Fähigkeiten</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+        <div className="print:pb-4">
+          <div className="print:text-xl">Fähigkeiten</div>
+        </div>
+        <div className="space-y-4">
           {Object.entries(application.resume_data.skills).map(([categoryName, skills]: [string, any]) => (
             <div key={categoryName}>
-              <h5 className="font-medium mb-2 capitalize print:text-base print:font-bold">{categoryName}</h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 print:gap-2">
+              <h5 className="mb-2 font-medium print:font-bold print:text-base capitalize">{categoryName}</h5>
+              <div className="gap-3 print:gap-2 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2">
                 {skills.map((skill: any) => (
-                  <div key={skill.id} className="flex items-center justify-between print:justify-start print:gap-4">
+                  <div key={skill.id} className="flex justify-between print:justify-start items-center print:gap-4">
                     <div className="flex-1">
-                      <div className="text-sm font-medium print:text-base print:font-bold">{skill.name}</div>
-                      <div className="text-xs text-muted-foreground print:text-sm print:text-black">
+                      <div className="font-medium print:font-bold text-sm print:text-base">{skill.name}</div>
+                      <div className="text-muted-foreground print:text-black text-xs print:text-sm">
                         {skill.yearsOfExperience} Jahre Erfahrung
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 print:hidden">{renderStars(skill.rating)}</div>
+                    <div className="print:hidden flex items-center gap-1">{renderStars(skill.rating)}</div>
                     <div className="hidden print:block text-sm">
                       {Array.from({ length: skill.rating }, () => "★").join("")}
                       {Array.from({ length: 5 - skill.rating }, () => "☆").join("")}
@@ -492,53 +609,51 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
               </div>
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
 
   const renderLanguages = () =>
     application.resume_data?.languages &&
     application.resume_data.languages.length > 0 && (
-      <Card className="print:shadow-none print:border-0">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Sprachen</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
-            {application.resume_data.languages.map((language: any) => (
-              <div key={language.id} className="flex items-center justify-between print:justify-start print:gap-4">
-                <div>
-                  <div className="font-medium flex items-center gap-2 print:text-base print:font-bold">
-                    {language.flag && <span>{language.flag}</span>}
-                    {language.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground print:text-base print:text-black">
-                    {language.description}
-                  </div>
+      <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+        <div className="print:pb-4">
+          <div className="print:text-xl">Sprachen</div>
+        </div>
+        <div className="space-y-4">
+          {application.resume_data.languages.map((language: any) => (
+            <div key={language.id} className="flex justify-between print:justify-start items-center print:gap-4">
+              <div>
+                <div className="flex items-center gap-2 font-medium print:font-bold print:text-base">
+                  {language.flag && <span>{language.flag}</span>}
+                  {language.name}
                 </div>
-                <Badge variant="outline" className="print:bg-gray-100 print:text-black print:text-sm">
-                  {language.level}
-                </Badge>
+                <div className="text-muted-foreground print:text-black text-sm print:text-base">
+                  {language.description}
+                </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <Badge variant="outline" className="print:bg-gray-100 print:text-black print:text-sm">
+                {language.level}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </div>
     )
 
   const renderProjects = () =>
     application.projects_data &&
     application.projects_data.length > 0 && (
-      <Card className="print:shadow-none print:border-0">
-        <CardHeader className="print:pb-4">
-          <CardTitle className="print:text-xl">Projekte</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6 print:space-y-4">
+      <div className="print:shadow-none print:border-0 print:break-before-page print:break-inside-avoid">
+        <div className="print:pb-4">
+          <div className="print:text-xl">Projekte</div>
+        </div>
+        <div className="space-y-6 print:space-y-4">
           {application.projects_data.map((project: any) => (
-            <div key={project.id} className="border-l-2 border-green-200 pl-4 print:border-l-4 print:border-gray-400">
-              <div className="flex items-start justify-between mb-2 print:block">
+            <div key={project.id} className="pl-4 border-green-200 print:border-gray-400 border-l-2 print:border-l-4">
+              <div className="print:block flex justify-between items-start mb-2">
                 <div>
-                  <h4 className="font-medium flex items-center gap-2 print:text-base print:font-bold">
+                  <h4 className="flex items-center gap-2 font-medium print:font-bold print:text-base">
                     {project.name}
                     {project.url && (
                       <a href={project.url} target="_blank" rel="noopener noreferrer" className="print:hidden">
@@ -546,12 +661,12 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
                       </a>
                     )}
                   </h4>
-                  <div className="text-sm text-muted-foreground print:text-base print:text-black">
+                  <div className="text-muted-foreground print:text-black text-sm print:text-base">
                     {project.role && `${project.role} • `}
                     {project.teamSize && `${project.teamSize} • `}
                     <Badge
                       variant="outline"
-                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                      className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
                     >
                       {project.status === "completed"
                         ? "Abgeschlossen"
@@ -561,25 +676,25 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
                     </Badge>
                   </div>
                 </div>
-                <div className="text-sm text-muted-foreground flex items-center gap-1 print:text-black print:text-base print:mt-1">
-                  <Calendar className="w-4 h-4 print:hidden" />
+                <div className="flex items-center gap-1 print:mt-1 text-muted-foreground print:text-black text-sm print:text-base">
+                  <Calendar className="print:hidden w-4 h-4" />
                   {formatDate(project.startDate)} - {formatDate(project.endDate)}
                 </div>
               </div>
 
               {project.description && (
-                <p className="text-sm leading-relaxed mb-3 print:text-base print:leading-relaxed">
+                <p className="mb-3 text-sm print:text-base leading-relaxed print:leading-relaxed">
                   {project.description}
                 </p>
               )}
 
               {project.achievements && project.achievements.length > 0 && (
                 <div className="mb-3">
-                  <div className="text-sm font-medium mb-1 print:text-base print:font-bold">Erfolge:</div>
-                  <ul className="text-sm space-y-1 print:text-base print:space-y-1">
-                    {project.achievements.map((achievement: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-green-500 mt-1 print:text-black">•</span>
+                  <div className="mb-1 font-medium print:font-bold text-sm print:text-base">Erfolge:</div>
+                  <ul className="space-y-1 print:space-y-1 text-sm print:text-base">
+                    {project.achievements.map((achievement: string) => (
+                      <li key={achievement} className="flex items-start gap-2">
+                        <span className="mt-1 text-green-500 print:text-black">•</span>
                         <span>{achievement}</span>
                       </li>
                     ))}
@@ -588,12 +703,12 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
               )}
 
               {project.technologies && project.technologies.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-3 print:gap-2">
-                  {project.technologies.map((tech: string, index: number) => (
+                <div className="flex flex-wrap gap-1 print:gap-2 mb-3">
+                  {project.technologies.map((tech: string) => (
                     <Badge
-                      key={index}
+                      key={tech}
                       variant="secondary"
-                      className="text-xs print:bg-gray-100 print:text-black print:text-sm print:px-2 print:py-1"
+                      className="print:bg-gray-100 print:px-2 print:py-1 print:text-black text-xs print:text-sm"
                     >
                       {tech}
                     </Badge>
@@ -608,151 +723,89 @@ export function ApplicationPreview({ application }: ApplicationPreviewProps) {
               )}
 
               {project.github && (
-                <div className="text-sm mt-2 print:text-base">
+                <div className="mt-2 text-sm print:text-base">
                   <a
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline flex items-center gap-1 print:text-black print:no-underline"
+                    className="flex items-center gap-1 text-blue-500 print:text-black hover:underline print:no-underline"
                   >
-                    <Github className="w-4 h-4 print:hidden" />
+                    <Github className="print:hidden w-4 h-4" />
                     GitHub Repository: {project.github}
                   </a>
                 </div>
               )}
 
               {project.url && (
-                <div className="text-sm mt-1 print:text-base hidden print:block">
+                <div className="hidden print:block mt-1 text-sm print:text-base">
                   <span className="font-medium">Live Demo:</span> {project.url}
                 </div>
               )}
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
 
   return (
-    <div className="max-w-4xl mx-auto print:max-w-none">
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 2.5cm 2cm 2.5cm 2cm;
-          }
-          
-          body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.4;
-            color: black;
-            background: white;
-          }
-          
-          .print\\:break-before-page {
-            break-before: page;
-          }
-          
-          .print\\:hidden {
-            display: none !important;
-          }
-          
-          .print\\:block {
-            display: block !important;
-          }
-          
-          .print\\:text-base {
-            font-size: 12pt !important;
-          }
-          
-          .print\\:text-xl {
-            font-size: 14pt !important;
-          }
-          
-          .print\\:text-2xl {
-            font-size: 16pt !important;
-          }
-          
-          .print\\:font-bold {
-            font-weight: bold !important;
-          }
-          
-          .print\\:text-black {
-            color: black !important;
-          }
-          
-          .print\\:border-gray-400 {
-            border-color: #9ca3af !important;
-          }
-          
-          .print\\:bg-gray-100 {
-            background-color: #f3f4f6 !important;
-          }
-          
-          .print\\:shadow-none {
-            box-shadow: none !important;
-          }
-          
-          .print\\:border-0 {
-            border: none !important;
-          }
-          
-          .print\\:no-underline {
-            text-decoration: none !important;
-          }
-        }
-      `}</style>
-
-      <ScrollArea className="h-[calc(100vh-200px)] print:h-auto">
-        <div className="space-y-6 p-6 print:p-0 print:space-y-8">
-          <div className="text-center mb-8 print:hidden">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Bewerbungsvorschau</h1>
-            <p className="text-muted-foreground">
-              Vorschau Ihrer Bewerbungsunterlagen für {application.job_title} bei {application.company}
-            </p>
-          </div>
-
-          {renderPersonalInfo()}
-          {renderCoverLetter()}
-          {renderSummary()}
-          {renderExperience()}
-          {renderEducation()}
-          {renderSkills()}
-          {renderLanguages()}
-          {renderProjects()}
-
-          {/* Attached Documents */}
-          {application.selected_documents && application.selected_documents.length > 0 && (
-            <Card className="print:shadow-none print:border-0">
-              <CardHeader className="print:pb-4">
-                <CardTitle className="flex items-center gap-2 print:text-xl">
-                  <FileText className="w-5 h-5 print:hidden" />
-                  Angehängte Dokumente
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-1 print:gap-2">
-                  {application.selected_documents.map((doc: any) => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center gap-3 p-3 border rounded-lg print:border-0 print:p-1"
-                    >
-                      <FileText className="w-8 h-8 text-blue-500 print:hidden" />
-                      <div className="flex-1">
-                        <div className="font-medium text-sm print:text-base print:font-bold">{doc.name}</div>
-                        <div className="text-xs text-muted-foreground print:text-sm print:text-black">
-                          {(doc.size / 1024).toFixed(1)} KB • {doc.section}
-                          {doc.description && ` • ${doc.description}`}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+    <div className="flex mx-auto max-w-5xl min-h-[80vh]">
+      {/* Sidebar */}
+      <nav className="flex flex-col gap-2 bg-white py-8 border-r w-48">
+        {docTypes.map(doc => (
+          <button
+            key={doc.id}
+            className={`text-left px-4 py-2 rounded font-medium transition-colors ${selectedDoc === doc.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100 text-gray-700'}`}
+            onClick={() => setSelectedDoc(doc.id as any)}
+            type="button"
+          >
+            {doc.label}
+          </button>
+        ))}
+      </nav>
+      {/* Document Preview */}
+      <div className="flex flex-col flex-1 p-6">
+        <div className="flex-1">
+          {selectedDoc === 'cover-letter' && (
+            <div className="bg-gray-50 shadow-md mb-8 p-6 border rounded-lg">{renderCoverLetter()}</div>
+          )}
+          {selectedDoc === 'resume' && (
+            <>
+              <div className="flex items-center gap-2 mb-4">
+                <Switch checked={atsMode} onCheckedChange={setAtsMode} id="ats-toggle" />
+                <label htmlFor="ats-toggle" className="font-medium text-sm">ATS-optimiertes Layout</label>
+              </div>
+              <div className="bg-gray-50 shadow-md mb-8 p-6 border rounded-lg">
+                {renderContactHeader()}
+                <Separator className="my-2 print:my-2" />
+                {renderExperience(atsMode)}
+                {renderEducation(atsMode)}
+                {renderSkills()}
+                {renderLanguages()}
+              </div>
+            </>
+          )}
+          {selectedDoc === 'projects' && (
+            <div className="bg-gray-50 shadow-md mb-8 p-6 border rounded-lg">{renderProjects()}</div>
           )}
         </div>
-      </ScrollArea>
+        {/* Blätterfunktion */}
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={goToPrevious}
+            className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded font-medium text-gray-700"
+            type="button"
+          >
+            ← Vorheriges
+          </button>
+          <button
+            onClick={goToNext}
+            className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded font-medium text-gray-700"
+            type="button"
+          >
+            Nächstes →
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

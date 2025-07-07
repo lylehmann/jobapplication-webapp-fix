@@ -1,5 +1,13 @@
 "use client"
-import { Calendar, MapPin, Phone, Mail, Globe, Github, Linkedin, Building, GraduationCap } from "lucide-react"
+import Calendar from "lucide-react/dist/esm/icons/calendar"
+import MapPin from "lucide-react/dist/esm/icons/map-pin"
+import Phone from "lucide-react/dist/esm/icons/phone"
+import Mail from "lucide-react/dist/esm/icons/mail"
+import Globe from "lucide-react/dist/esm/icons/globe"
+import Github from "lucide-react/dist/esm/icons/github"
+import Linkedin from "lucide-react/dist/esm/icons/linkedin"
+import Building from "lucide-react/dist/esm/icons/building"
+import GraduationCap from "lucide-react/dist/esm/icons/graduation-cap"
 import type { Database } from "@/lib/database.types"
 
 type Application = Database["public"]["Tables"]["applications"]["Row"]
@@ -35,14 +43,14 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
   return (
     <div
       id="printable-resume-complex"
-      className="max-w-none mx-auto bg-white text-black"
+      className="bg-white mx-auto max-w-none text-black"
       style={{ fontFamily: "Times New Roman, serif", fontSize: "11pt", lineHeight: "1.3" }}
     >
       {/* Header */}
-      <div className="text-center mb-8 pb-4 border-b border-gray-400">
-        <h1 className="text-2xl font-bold mb-3">{personalInfo.fullName || "Ihr Name"}</h1>
-        <div className="text-sm space-y-1">
-          <div className="flex justify-center items-center gap-4 flex-wrap">
+      <div className="mb-8 pb-4 border-gray-400 border-b text-center">
+        <h1 className="mb-3 font-bold text-2xl">{personalInfo.fullName || "Ihr Name"}</h1>
+        <div className="space-y-1 text-sm">
+          <div className="flex flex-wrap justify-center items-center gap-4">
             {personalInfo.location && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
@@ -62,7 +70,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
               </span>
             )}
           </div>
-          <div className="flex justify-center items-center gap-4 flex-wrap mt-2">
+          <div className="flex flex-wrap justify-center items-center gap-4 mt-2">
             {personalInfo.portfolio && (
               <span className="flex items-center gap-1">
                 <Globe className="w-3 h-3" />
@@ -88,7 +96,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Professional Summary */}
       {resume.summary && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-3 pb-1 border-b border-gray-300">BERUFLICHES PROFIL</h2>
+          <h2 className="mb-3 pb-1 border-gray-300 border-b font-bold text-base">BERUFLICHES PROFIL</h2>
           <p className="text-sm text-justify leading-relaxed">{resume.summary}</p>
         </div>
       )}
@@ -96,7 +104,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Complex Experience - Grouped by Company */}
       {Object.keys(groupedExperiences).length > 0 && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-4 pb-1 border-b border-gray-300">BERUFSERFAHRUNG</h2>
+          <h2 className="mb-4 pb-1 border-gray-300 border-b font-bold text-base">BERUFSERFAHRUNG</h2>
           <div className="space-y-6">
             {Object.entries(groupedExperiences).map(([company, experiences]: [string, any]) => {
               // Calculate total time at company
@@ -109,20 +117,20 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                 : sortedExps[sortedExps.length - 1].endDate
 
               return (
-                <div key={company} className="border-l-2 border-blue-200 pl-4">
+                <div key={company} className="pl-4 border-blue-200 border-l-2">
                   {/* Company Header with Total Duration */}
-                  <div className="mb-3 bg-blue-50 p-3 rounded-r border-l-4 border-blue-400">
+                  <div className="bg-blue-50 mb-3 p-3 border-blue-400 border-l-4 rounded-r">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <Building className="w-4 h-4 text-blue-600" />
-                          <h3 className="font-bold text-base text-blue-800">{company}</h3>
+                          <h3 className="font-bold text-blue-800 text-base">{company}</h3>
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-gray-600 text-sm">
                           {experiences.length > 1 ? `${experiences.length} Positionen` : "1 Position"}
                         </div>
                       </div>
-                      <div className="text-right text-sm font-medium text-blue-700">
+                      <div className="font-medium text-blue-700 text-sm text-right">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {firstStart} - {lastEnd}
@@ -136,10 +144,10 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                     {experiences.map((exp: any, index: number) => (
                       <div key={exp.id || index} className="flex gap-6">
                         {/* Date Column - Fixed Width */}
-                        <div className="w-32 flex-shrink-0 text-right pr-4 border-r border-gray-200">
-                          <div className="text-sm font-medium">
+                        <div className="flex-shrink-0 pr-4 border-gray-200 border-r w-32 text-right">
+                          <div className="font-medium text-sm">
                             {exp.startDate && (
-                              <div className="flex items-center justify-end gap-1">
+                              <div className="flex justify-end items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {new Date(exp.startDate + "-01").toLocaleDateString("de-DE", {
                                   month: "2-digit",
@@ -147,9 +155,9 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                                 })}
                               </div>
                             )}
-                            <div className="text-center my-1">bis</div>
+                            <div className="my-1 text-center">bis</div>
                             {exp.current ? (
-                              <div className="text-blue-600 font-medium">heute</div>
+                              <div className="font-medium text-blue-600">heute</div>
                             ) : exp.endDate ? (
                               <div>
                                 {new Date(exp.endDate + "-01").toLocaleDateString("de-DE", {
@@ -166,26 +174,26 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                         {/* Position Content - Flexible Width */}
                         <div className="flex-1">
                           <div className="mb-2">
-                            <h4 className="font-bold text-sm text-gray-900">{exp.title}</h4>
+                            <h4 className="font-bold text-gray-900 text-sm">{exp.title}</h4>
                             {exp.location && (
-                              <div className="text-sm text-gray-600 flex items-center gap-1">
+                              <div className="flex items-center gap-1 text-gray-600 text-sm">
                                 <MapPin className="w-3 h-3" />
                                 {exp.location}
                               </div>
                             )}
                             {index > 0 && (
-                              <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded mt-1 inline-block">
+                              <div className="inline-block bg-blue-100 mt-1 px-2 py-1 rounded text-blue-600 text-xs">
                                 Beförderung/Positionswechsel
                               </div>
                             )}
                           </div>
 
-                          <p className="text-sm mb-3 text-justify leading-relaxed">{exp.description}</p>
+                          <p className="mb-3 text-sm text-justify leading-relaxed">{exp.description}</p>
 
                           {exp.achievements && exp.achievements.length > 0 && (
                             <div className="mb-3">
-                              <h5 className="font-medium text-sm mb-1">Erfolge und Leistungen:</h5>
-                              <ul className="text-sm space-y-1">
+                              <h5 className="mb-1 font-medium text-sm">Erfolge und Leistungen:</h5>
+                              <ul className="space-y-1 text-sm">
                                 {exp.achievements.map((achievement: string, achIndex: number) => (
                                   <li key={achIndex} className="flex items-start">
                                     <span className="mr-2 text-blue-500">•</span>
@@ -215,15 +223,15 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Gap Year / Additional Activities Section */}
       {resume.gapYearActivities && resume.gapYearActivities.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-4 pb-1 border-b border-gray-300">
+          <h2 className="mb-4 pb-1 border-gray-300 border-b font-bold text-base">
             ZUSÄTZLICHE ERFAHRUNGEN & AKTIVITÄTEN
           </h2>
-          <div className="bg-yellow-50 p-4 rounded border-l-4 border-yellow-400">
+          <div className="bg-yellow-50 p-4 border-yellow-400 border-l-4 rounded">
             <div className="space-y-4">
               {resume.gapYearActivities.map((activity: any, index: number) => (
                 <div key={index} className="flex gap-6">
-                  <div className="w-32 flex-shrink-0 text-right pr-4 border-r border-yellow-200">
-                    <div className="text-sm font-medium">
+                  <div className="flex-shrink-0 pr-4 border-yellow-200 border-r w-32 text-right">
+                    <div className="font-medium text-sm">
                       {activity.startDate && (
                         <div>
                           {new Date(activity.startDate + "-01").toLocaleDateString("de-DE", {
@@ -232,7 +240,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                           })}
                         </div>
                       )}
-                      <div className="text-center my-1">bis</div>
+                      <div className="my-1 text-center">bis</div>
                       {activity.endDate ? (
                         <div>
                           {new Date(activity.endDate + "-01").toLocaleDateString("de-DE", {
@@ -247,10 +255,10 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-sm">{activity.title}</h4>
-                    <div className="text-sm text-gray-700 mb-2">{activity.type}</div>
+                    <div className="mb-2 text-gray-700 text-sm">{activity.type}</div>
                     <p className="text-sm text-justify">{activity.description}</p>
                     {activity.skills && (
-                      <div className="text-sm mt-2">
+                      <div className="mt-2 text-sm">
                         <strong>Erworbene Fähigkeiten:</strong> {activity.skills.join(", ")}
                       </div>
                     )}
@@ -265,27 +273,27 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Education with Extended Activities */}
       {resume.education && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-4 pb-1 border-b border-gray-300">BILDUNG & WEITERBILDUNG</h2>
+          <h2 className="mb-4 pb-1 border-gray-300 border-b font-bold text-base">BILDUNG & WEITERBILDUNG</h2>
 
           {resume.education.degree && (
-            <div className="grid grid-cols-12 gap-4 mb-4">
-              <div className="col-span-3 text-right pr-4 border-r border-gray-200">
-                <div className="text-sm font-medium">{resume.education.degree.graduationYear}</div>
+            <div className="gap-4 grid grid-cols-12 mb-4">
+              <div className="col-span-3 pr-4 border-gray-200 border-r text-right">
+                <div className="font-medium text-sm">{resume.education.degree.graduationYear}</div>
               </div>
               <div className="col-span-9">
                 <div className="flex items-center gap-2 mb-1">
                   <GraduationCap className="w-4 h-4 text-green-600" />
                   <h3 className="font-bold text-sm">{resume.education.degree.title}</h3>
                 </div>
-                <div className="text-sm text-gray-700">
+                <div className="text-gray-700 text-sm">
                   <strong>{resume.education.degree.institution}</strong>
                   {resume.education.degree.location && <span>, {resume.education.degree.location}</span>}
                 </div>
                 {resume.education.degree.gpa && (
-                  <div className="text-sm mt-1">Abschlussnote: {resume.education.degree.gpa}</div>
+                  <div className="mt-1 text-sm">Abschlussnote: {resume.education.degree.gpa}</div>
                 )}
                 {resume.education.degree.thesis && (
-                  <div className="text-sm mt-1 italic">Abschlussarbeit: {resume.education.degree.thesis}</div>
+                  <div className="mt-1 text-sm italic">Abschlussarbeit: {resume.education.degree.thesis}</div>
                 )}
               </div>
             </div>
@@ -294,10 +302,10 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
           {/* Certifications with Timeline */}
           {resume.education.certifications && resume.education.certifications.length > 0 && (
             <div>
-              <h3 className="font-medium text-sm mb-3 text-green-700">Zertifikate & Weiterbildungen</h3>
+              <h3 className="mb-3 font-medium text-green-700 text-sm">Zertifikate & Weiterbildungen</h3>
               {resume.education.certifications.map((cert: any) => (
-                <div key={cert.id} className="grid grid-cols-12 gap-4 mb-3 bg-green-50 p-2 rounded">
-                  <div className="col-span-3 text-right pr-4 border-r border-green-200">
+                <div key={cert.id} className="gap-4 grid grid-cols-12 bg-green-50 mb-3 p-2 rounded">
+                  <div className="col-span-3 pr-4 border-green-200 border-r text-right">
                     <div className="text-sm">
                       {cert.date &&
                         new Date(cert.date).toLocaleDateString("de-DE", {
@@ -305,7 +313,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                           year: "numeric",
                         })}
                       {cert.expirationDate && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-gray-500 text-xs">
                           bis{" "}
                           {new Date(cert.expirationDate).toLocaleDateString("de-DE", {
                             month: "2-digit",
@@ -317,9 +325,9 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                   </div>
                   <div className="col-span-9">
                     <div className="font-medium text-sm">{cert.name}</div>
-                    <div className="text-sm text-gray-700">{cert.issuer}</div>
+                    <div className="text-gray-700 text-sm">{cert.issuer}</div>
                     {cert.credentialId && (
-                      <div className="text-xs text-gray-500">Zertifikats-ID: {cert.credentialId}</div>
+                      <div className="text-gray-500 text-xs">Zertifikats-ID: {cert.credentialId}</div>
                     )}
                   </div>
                 </div>
@@ -333,8 +341,8 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {resume.skills &&
         Object.values(resume.skills).some((skills: any) => Array.isArray(skills) && skills.length > 0) && (
           <div className="mb-6">
-            <h2 className="text-base font-bold mb-3 pb-1 border-b border-gray-300">TECHNISCHE FÄHIGKEITEN</h2>
-            <div className="grid grid-cols-2 gap-6">
+            <h2 className="mb-3 pb-1 border-gray-300 border-b font-bold text-base">TECHNISCHE FÄHIGKEITEN</h2>
+            <div className="gap-6 grid grid-cols-2">
               {Object.entries(resume.skills).map(([category, skills]) => {
                 if (!Array.isArray(skills) || skills.length === 0) return null
 
@@ -346,11 +354,11 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                 }
 
                 return (
-                  <div key={category} className="bg-gray-50 p-3 rounded border-l-4 border-gray-400">
-                    <h3 className="font-medium text-sm mb-2 text-gray-800">{categoryTitles[category] || category}</h3>
+                  <div key={category} className="bg-gray-50 p-3 border-gray-400 border-l-4 rounded">
+                    <h3 className="mb-2 font-medium text-gray-800 text-sm">{categoryTitles[category] || category}</h3>
                     <div className="space-y-2">
                       {skills.map((skill: any, index: number) => (
-                        <div key={index} className="bg-white p-2 rounded border text-sm">
+                        <div key={index} className="bg-white p-2 border rounded text-sm">
                           <div className="flex justify-between items-center">
                             <span className="font-medium">{skill.name}</span>
                             <div className="flex items-center gap-2">
@@ -364,7 +372,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
                                   />
                                 ))}
                               </div>
-                              <span className="text-xs text-gray-500">{skill.yearsOfExperience}J</span>
+                              <span className="text-gray-500 text-xs">{skill.yearsOfExperience}J</span>
                             </div>
                           </div>
                         </div>
@@ -380,18 +388,18 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Languages */}
       {resume.languages && resume.languages.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-3 pb-1 border-b border-gray-300">SPRACHKENNTNISSE</h2>
-          <div className="bg-yellow-50 p-3 rounded border-l-4 border-yellow-400">
-            <div className="grid grid-cols-2 gap-4">
+          <h2 className="mb-3 pb-1 border-gray-300 border-b font-bold text-base">SPRACHKENNTNISSE</h2>
+          <div className="bg-yellow-50 p-3 border-yellow-400 border-l-4 rounded">
+            <div className="gap-4 grid grid-cols-2">
               {resume.languages.map((language: any) => (
-                <div key={language.id} className="bg-white p-2 rounded border text-sm">
+                <div key={language.id} className="bg-white p-2 border rounded text-sm">
                   <div className="flex items-center gap-2 mb-1">
                     {language.flag && <span className="text-base">{language.flag}</span>}
                     <span className="font-medium">{language.name}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">{language.level}</span>
-                    <span className="text-xs text-gray-600">{language.description}</span>
+                    <span className="bg-yellow-100 px-2 py-1 rounded text-yellow-800 text-xs">{language.level}</span>
+                    <span className="text-gray-600 text-xs">{language.description}</span>
                   </div>
                 </div>
               ))}
@@ -403,25 +411,25 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       {/* Projects Summary */}
       {application.projects_data && application.projects_data.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-base font-bold mb-3 pb-1 border-b border-gray-300">PROJEKTÜBERSICHT</h2>
-          <div className="bg-purple-50 p-3 rounded border-l-4 border-purple-400">
-            <div className="text-sm text-center mb-3">
+          <h2 className="mb-3 pb-1 border-gray-300 border-b font-bold text-base">PROJEKTÜBERSICHT</h2>
+          <div className="bg-purple-50 p-3 border-purple-400 border-l-4 rounded">
+            <div className="mb-3 text-sm text-center">
               <strong>{application.projects_data.length} Frontend-Projekte</strong> - Detaillierte Projektdokumentation
               als separate Anlage verfügbar
             </div>
-            <div className="grid grid-cols-1 gap-2">
+            <div className="gap-2 grid grid-cols-1">
               {application.projects_data.slice(0, 3).map((project: any) => (
-                <div key={project.id} className="bg-white p-2 rounded border">
+                <div key={project.id} className="bg-white p-2 border rounded">
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-medium text-sm">{project.name}</h4>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-gray-600 text-xs">
                         {project.role} • {project.startDate} - {project.endDate || "heute"}
                       </div>
                     </div>
                     <div className="text-right">
                       {project.technologies && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-gray-500 text-xs">
                           {project.technologies.slice(0, 2).join(", ")}
                           {project.technologies.length > 2 && ` +${project.technologies.length - 2}`}
                         </div>
@@ -436,7 +444,7 @@ export function PrintableResumeComplex({ application }: PrintableResumeComplexPr
       )}
 
       {/* Footer */}
-      <div className="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-gray-300">
+      <div className="mt-8 pt-4 border-gray-300 border-t text-gray-500 text-xs text-center">
         Lebenslauf - {personalInfo.fullName} - {new Date().toLocaleDateString("de-DE")}
       </div>
     </div>
