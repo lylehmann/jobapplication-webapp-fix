@@ -1,0 +1,19 @@
+# Development tools — not needed in Vercel deployment
+.storybook/
+stories/
+scripts/
+supabase/
+
+# Local environment files
+.env*.local
+.env
+
+# Editor/OS artifacts
+.vscode/
+.DS_Store
+
+# Test artifacts
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
